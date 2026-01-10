@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model location {
+  id            Int             @id @default(autoincrement())
+  name          String          @unique(map: "Location_name_key")
+  stocklocation stocklocation[]
+}
+
+model product {
+  id            Int             @id @default(autoincrement())
+  sku           String          @unique(map: "Product_sku_key")
+  name          String
+  barcode       String?
+  minimumStock  Int             @default(0)
+  createdAt     DateTime        @default(now())
+  stocklocation stocklocation[]
+  stockmovement stockmovement[]
+}
+
+model stocklocation {
+  id         Int      @id @default(autoincrement())
+  productId  Int
+  locationId Int
+  qty        Int
+  location   location @relation(fields: [locationId], references: [id], map: "StockLocation_locationId_fkey")
+  product    product  @relation(fields: [productId], references: [id], map: "StockLocation_productId_fkey")
+
+  @@unique([productId, locationId], map: "StockLocation_productId_locationId_key")
+  @@index([locationId], map: "StockLocation_locationId_fkey")
+}
+
+model stockmovement {
+  id        Int                   @id @default(autoincrement())
+  productId Int
+  type      stockmovement_type
+  qty       Int
+  refType   stockmovement_refType
+  createdAt DateTime              @default(now())
+  product   product               @relation(fields: [productId], references: [id], map: "StockMovement_productId_fkey")
+
+  @@index([productId], map: "StockMovement_productId_fkey")
+}
+
+enum stockmovement_type {
+  IN
+  OUT
+}
+
+enum stockmovement_refType {
+  MANUAL
+  IMPORT
+  SALE
+}
