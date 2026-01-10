@@ -49,7 +49,7 @@ export default function BestsellersTab() {
     <div className="space-y-6">
       <div className="flex gap-2 items-center mb-4">
         <TrendingUp className="text-blue-600" size={24} />
-        <h2 className="text-2xl font-bold text-gray-900">Sales Analytics</h2>
+        <h2 className="text-2xl font-bold text-gray-900">การวิเคราะห์ยอดขาย</h2>
       </div>
 
       <div className="flex gap-2">
@@ -86,18 +86,18 @@ export default function BestsellersTab() {
       </div>
 
       {loading ? (
-        <div className="text-center py-12 text-gray-500">Loading...</div>
+        <div className="text-center py-12 text-gray-500">กำลังโหลด...</div>
       ) : salesData.length === 0 ? (
-        <div className="text-center py-12 text-gray-500">No data available</div>
+        <div className="text-center py-12 text-gray-500">ไม่มีข้อมูล</div>
       ) : (
         <div className="border border-gray-200 rounded-lg overflow-hidden">
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Product</th>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">ชื่อผลิตภัณฑ์</th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">SKU</th>
-                <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700">Total Qty</th>
-                <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700">Transactions</th>
+                <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700">ปริมาณรวม</th>
+                <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700">ธุรกรรม</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">

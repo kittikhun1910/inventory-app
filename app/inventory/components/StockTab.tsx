@@ -46,20 +46,20 @@ export default function StockTab() {
           onClick={() => setShowAddProduct(true)}
           className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
         >
-          <Plus size={18} /> Add Product
+          <Plus size={18} /> เพิ่มสินค้า
         </button>
         <button 
           onClick={() => setShowImport(true)}
           className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors"
         >
-          <Upload size={18} /> Import Excel
+          <Upload size={18} /> นำเข้าไฟล์ด้วย Excel
         </button>
         <button 
           onClick={load}
           disabled={loading}
           className="inline-flex items-center gap-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 disabled:bg-gray-400 text-white rounded-lg font-medium transition-colors"
         >
-          <RotateCcw size={18} /> Refresh
+          <RotateCcw size={18} /> รีเฟรช
         </button>
       </div>
 
@@ -68,17 +68,17 @@ export default function StockTab() {
           <thead className="bg-gray-50 border-b border-gray-200 sticky top-0">
             <tr>
               <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 min-w-24">SKU</th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 min-w-48">Product Name</th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 min-w-32">Barcode</th>
-              <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700 min-w-20">Min Stock</th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 min-w-48">ชื่อผลิตภัณฑ์</th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 min-w-32">บาร์โค้ด</th>
+              <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700 min-w-20">สต๊อกขั้นต่ำ</th>
               <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700 min-w-40">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
             {loading ? (
-              <tr><td colSpan={5} className="px-4 py-12 text-center text-gray-500">Loading...</td></tr>
+              <tr><td colSpan={5} className="px-4 py-12 text-center text-gray-500">กำลังโหลด....</td></tr>
             ) : filtered.length === 0 ? (
-              <tr><td colSpan={5} className="px-4 py-12 text-center text-gray-500">No products found</td></tr>
+              <tr><td colSpan={5} className="px-4 py-12 text-center text-gray-500">ไม่พบสินค้า</td></tr>
             ) : (
               filtered.map(p => (
                 <tr key={p.id} className="hover:bg-gray-50 transition-colors">

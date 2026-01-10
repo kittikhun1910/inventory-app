@@ -69,7 +69,7 @@ export default function LocationsTab() {
     <div className="space-y-6">
       <div className="flex gap-2 items-center mb-4">
         <MapPin className="text-blue-600" size={24} />
-        <h2 className="text-2xl font-bold text-gray-900">Locations Management</h2>
+        <h2 className="text-2xl font-bold text-gray-900">การจัดการสถานที่ตั้ง</h2>
       </div>
 
       <div className="bg-white rounded-lg border border-gray-200 p-4">
@@ -94,18 +94,18 @@ export default function LocationsTab() {
       </div>
 
       {loading && !locations.length ? (
-        <div className="text-center py-12 text-gray-500">Loading locations...</div>
+        <div className="text-center py-12 text-gray-500">กำลังโหลดสถานที่ตั้ง...</div>
       ) : locations.length === 0 ? (
         <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 text-center text-gray-600">
           <MapPin size={32} className="mx-auto mb-2 text-gray-400" />
-          <p>No locations yet. Create one to get started.</p>
+          <p>ยังไม่มีสถานที่ตั้ง สร้างสถานที่ตั้งเพื่อเริ่มต้น</p>
         </div>
       ) : (
         <div className="border border-gray-200 rounded-lg overflow-hidden">
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Location Name</th>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">ชื่อสถานที่ตั้ง</th>
                 <th className="px-6 py-3 text-right text-sm font-semibold text-gray-700">Actions</th>
               </tr>
             </thead>
@@ -133,7 +133,7 @@ export default function LocationsTab() {
                           className="flex items-center gap-1 px-3 py-1 bg-green-100 text-green-700 rounded hover:bg-green-200 disabled:opacity-50 font-medium text-sm"
                         >
                           <Check size={16} />
-                          Save
+                          บันทึก
                         </button>
                         <button
                           onClick={() => setEditing(null)}
@@ -141,7 +141,7 @@ export default function LocationsTab() {
                           className="flex items-center gap-1 px-3 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 disabled:opacity-50 font-medium text-sm"
                         >
                           <X size={16} />
-                          Cancel
+                          ยกเลิก
                         </button>
                       </div>
                     ) : (
@@ -151,14 +151,14 @@ export default function LocationsTab() {
                           disabled={loading}
                           className="px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 disabled:opacity-50 font-medium text-sm"
                         >
-                          Edit
+                          เเก้ไข
                         </button>
                         <button
                           onClick={() => doDelete(loc)}
                           disabled={loading}
                           className="px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 disabled:opacity-50 font-medium text-sm"
                         >
-                          Delete
+                          ลบ
                         </button>
                       </div>
                     )}

@@ -31,19 +31,19 @@ export default function ReorderTab() {
     <div className="space-y-6">
       <div className="flex gap-2 items-center mb-4">
         <AlertTriangle className="text-yellow-600" size={24} />
-        <h2 className="text-2xl font-bold text-gray-900">Reorder Alerts</h2>
+        <h2 className="text-2xl font-bold text-gray-900">การแจ้งเตือนการสั่งซื้อซ้ำ</h2>
       </div>
 
       {loading ? (
-        <div className="text-center py-12 text-gray-500">Loading...</div>
+        <div className="text-center py-12 text-gray-500">กำลังโหลด...</div>
       ) : products.length === 0 ? (
         <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-green-700">
-          ✓ All products are above minimum stock levels
+          ✓ ทุกสินค้ามีสต๊อกมากกว่าระดับขั้นต่ำ
         </div>
       ) : (
         <div className="space-y-4">
           <div className="text-sm text-gray-600 mb-4">
-            {products.length} product(s) below minimum stock level
+            {products.length} สินค้าที่มีสต๊อกต่ำกว่าระดับขั้นต่ำ
           </div>
           
           <div className="border border-gray-200 rounded-lg overflow-hidden">
@@ -51,10 +51,10 @@ export default function ReorderTab() {
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">SKU</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Product Name</th>
-                  <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700">Current Stock</th>
-                  <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700">Minimum Level</th>
-                  <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700">Shortage</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">ชื่อผลิตภัณฑ์</th>
+                  <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700">สต๊อกปัจจุบัน</th>
+                  <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700">ระดับขั้นต่ำ</th>
+                  <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700">ขาดแคลน</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">

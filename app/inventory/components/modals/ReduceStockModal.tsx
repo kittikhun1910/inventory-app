@@ -50,7 +50,7 @@ export default function ReduceStockModal({ open, onClose, productId, onDone }: {
     setLoading(true);
     try {
       await postJSON('/api/stock/out', { sku: undefined, productId, locationName, qty, refType });
-      toast.success(`✓ Removed ${qty} units from ${locationName}`, {
+      toast.success(`✓ ลบ ${qty} หน่วยจาก ${locationName} แล้ว`, {
         position: 'top-right',
         autoClose: 3000,
         hideProgressBar: false,
@@ -64,7 +64,7 @@ export default function ReduceStockModal({ open, onClose, productId, onDone }: {
       setRefType('SALE');
       onClose();
     } catch (err: any) {
-      const errorMsg = err?.message ?? 'Failed to reduce stock';
+      const errorMsg = err?.message ?? 'ไม่สามารถลดปริมาณสินค้าคงคลังได้';
       setError(errorMsg);
       toast.error(`✗ Error: ${errorMsg}`, {
         position: 'top-right',
@@ -83,7 +83,7 @@ export default function ReduceStockModal({ open, onClose, productId, onDone }: {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-white rounded-lg shadow-lg max-w-md w-full mx-4">
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900">Reduce Stock</h2>
+          <h2 className="text-xl font-semibold text-gray-900">ลดสต็อก</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
             <X size={24} />
           </button>
@@ -93,7 +93,7 @@ export default function ReduceStockModal({ open, onClose, productId, onDone }: {
           {error && <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">{error}</div>}
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Quantity *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">ปริมาณ *</label>
             <input 
               type="number" 
               required 
@@ -105,14 +105,14 @@ export default function ReduceStockModal({ open, onClose, productId, onDone }: {
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Location *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">ตำแหน่งที่ตั้ง *</label>
             <select 
               value={locationName} 
               onChange={e => setLocationName(e.target.value)}
               required
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="">Select a location...</option>
+              <option value="">เลือกสถานที่ตั้ง ...</option>
               {locations.map(loc => (
                 <option key={loc.id} value={loc.name}>{loc.name}</option>
               ))}
@@ -120,14 +120,14 @@ export default function ReduceStockModal({ open, onClose, productId, onDone }: {
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Reference Type</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">ประเภทอ้างอิง</label>
             <select 
               value={refType} 
               onChange={e => setRefType(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="SALE">Sale</option>
-              <option value="MANUAL">Manual</option>
+              <option value="SALE">ขาย</option>
+              <option value="MANUAL">MANUAL</option>
             </select>
           </div>
           

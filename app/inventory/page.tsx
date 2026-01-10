@@ -8,13 +8,13 @@ import LocationsTab from './components/LocationsTab';
 import BestsellersTab from './components/BestsellersTab';
 import ReorderTab from './components/ReorderTab';
 
-const TABS = ['Stock', 'Bestsellers', 'Reorder', 'Locations'] as const;
+const TABS = ['คลังสินค้า', 'สินค้าขายดี', 'การสั่งซื้อใหม่', 'สถานที่ตั้ง'] as const;
 
-const TAB_ICONS = {
-  Stock: Package,
-  Bestsellers: TrendingUp,
-  Reorder: AlertTriangle,
-  Locations: MapPin,
+const TAB_ICONS: Record<typeof TABS[number], any> = {
+  'คลังสินค้า': Package,
+  'สินค้าขายดี': TrendingUp,
+  'การสั่งซื้อใหม่': AlertTriangle,
+  'สถานที่ตั้ง': MapPin,
 };
 
 interface DashboardStats {
@@ -25,7 +25,7 @@ interface DashboardStats {
 }
 
 export default function InventoryPage() {
-  const [tab, setTab] = useState<typeof TABS[number]>('Stock');
+  const [tab, setTab] = useState<typeof TABS[number]>('คลังสินค้า');
   const [products, setProducts] = useState<any[]>([]);
   const [stats, setStats] = useState<DashboardStats>({
     totalProducts: 0,
@@ -109,8 +109,8 @@ export default function InventoryPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Inventory Management System</h1>
-          <p className="text-gray-600 text-lg">Real-time inventory tracking, analytics, and warehouse management</p>
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">ระบบจัดการสินค้าคงคลัง</h1>
+          <p className="text-gray-600 text-lg">การติดตามสินค้าคงคลังแบบเรียลไทม์ การวิเคราะห์ข้อมูล และการจัดการคลังสินค้า</p>
         </div>
 
         {/* Dashboard Statistics */}
@@ -143,25 +143,25 @@ export default function InventoryPage() {
 
         {/* All Products Table */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">All Products</h2>
+          <h2 className="text-xl font-bold text-gray-900 mb-4">สินค้าทั้งหมด</h2>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
                   <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">SKU</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Product Name</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Barcode</th>
-                  <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700">Selling Price</th>
-                  <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700">Current Stock</th>
-                  <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700">Min Stock</th>
-                  <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700">Status</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">ชื่อผลิตภัณฑ์</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">บาร์โค้ด</th>
+                  <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700">ราคาขาย</th>
+                  <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700">สต๊อกปัจจุบัน</th>
+                  <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700">สต๊อกขั้นต่ำ</th>
+                  <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700">สถานะ</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {loading ? (
-                  <tr><td colSpan={7} className="px-4 py-8 text-center text-gray-500">Loading products...</td></tr>
+                  <tr><td colSpan={7} className="px-4 py-8 text-center text-gray-500">กำลังโหลดสินค้า...</td></tr>
                 ) : products.length === 0 ? (
-                  <tr><td colSpan={7} className="px-4 py-8 text-center text-gray-500">No products found</td></tr>
+                  <tr><td colSpan={7} className="px-4 py-8 text-center text-gray-500">ไม่พบสินค้า</td></tr>
                 ) : (
                   products.map(p => {
                     const currentStock = getStockAtLocation(p.stocklocation);
@@ -182,7 +182,7 @@ export default function InventoryPage() {
                               ? 'bg-yellow-100 text-yellow-700'
                               : 'bg-green-100 text-green-700'
                           }`}>
-                            {currentStock === 0 ? 'Out of Stock' : isLowStock ? 'Low Stock' : 'In Stock'}
+                            {currentStock === 0 ? 'สินค้าหมด' : isLowStock ? 'สินค้าเหลือน้อย' : 'มีสินค้าพร้อมส่ง'}
                           </span>
                         </td>
                       </tr>
@@ -215,10 +215,10 @@ export default function InventoryPage() {
           </div>
 
           <div className="p-6">
-            {tab === 'Stock' && <StockTab />}
-            {tab === 'Bestsellers' && <BestsellersTab />}
-            {tab === 'Reorder' && <ReorderTab />}
-            {tab === 'Locations' && <LocationsTab />}
+            {tab === 'คลังสินค้า' && <StockTab />}
+            {tab === 'สินค้าขายดี' && <BestsellersTab />}
+            {tab === 'การสั่งซื้อใหม่' && <ReorderTab />}
+            {tab === 'สถานที่ตั้ง' && <LocationsTab />}
           </div>
         </div>
       </div>

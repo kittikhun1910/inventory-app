@@ -48,7 +48,7 @@ export default function AddStockModal({ open, onClose, productId, onDone }: { op
     setLoading(true);
     try {
       await postJSON('/api/stock/in', { sku: undefined, productId, locationName, qty, refType });
-      toast.success(`✓ Added ${qty} units to ${locationName}`, {
+      toast.success(`✓ เพิ่ม ${qty} หน่วยไปยัง ${locationName}`, {
         position: 'top-right',
         autoClose: 3000,
         hideProgressBar: false,
@@ -62,7 +62,7 @@ export default function AddStockModal({ open, onClose, productId, onDone }: { op
       setRefType('MANUAL');
       onClose();
     } catch (err: any) {
-      const errorMsg = err?.message ?? 'Failed to add stock';
+      const errorMsg = err?.message ?? 'เพิ่มสต๊อกไม่สำเร็จ';
       setError(errorMsg);
       toast.error(`✗ Error: ${errorMsg}`, {
         position: 'top-right',
@@ -81,7 +81,7 @@ export default function AddStockModal({ open, onClose, productId, onDone }: { op
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-white rounded-lg shadow-lg max-w-md w-full mx-4">
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900">Add Stock</h2>
+          <h2 className="text-xl font-semibold text-gray-900">เพิ่มสต๊อก</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
             <X size={24} />
           </button>
@@ -91,7 +91,7 @@ export default function AddStockModal({ open, onClose, productId, onDone }: { op
           {error && <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">{error}</div>}
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Quantity *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">ปริมาณ *</label>
             <input 
               type="number" 
               required 
@@ -103,14 +103,14 @@ export default function AddStockModal({ open, onClose, productId, onDone }: { op
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Location *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">สร้างสถานที่ตั้ง *</label>
             <select 
               value={locationName} 
               onChange={e => setLocationName(e.target.value)}
               required
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="">Select a location...</option>
+              <option value="">เลือกสถานที่ตั้ง...</option>
               {locations.map(loc => (
                 <option key={loc.id} value={loc.name}>{loc.name}</option>
               ))}
@@ -118,14 +118,14 @@ export default function AddStockModal({ open, onClose, productId, onDone }: { op
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Reference Type</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">ประเภทอ้างอิง</label>
             <select 
               value={refType} 
               onChange={e => setRefType(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="MANUAL">Manual</option>
-              <option value="IMPORT">Import</option>
+              <option value="IMPORT">นำเข้า</option>
             </select>
           </div>
           
@@ -136,7 +136,7 @@ export default function AddStockModal({ open, onClose, productId, onDone }: { op
               disabled={loading}
               className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 disabled:bg-gray-100 rounded-lg font-medium transition-colors"
             >
-              Cancel
+              ยกเลิก
             </button>
             <button 
               type="submit" 
