@@ -1,15 +1,46 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
-import { postJSON } from '@/lib/api';
+import { postJSON, fetchJSON } from '@/lib/api';
+import { toast } from 'react-toastify';
 
 export default function ReduceStockModal({ open, onClose, productId, onDone }: { open: boolean; onClose: () => void; productId?: number; onDone?: () => void }) {
   const [qty, setQty] = useState(0);
-  const [locationName, setLocationName] = useState('Main');
+  const [locationName, setLocationName] = useState('');
   const [refType, setRefType] = useState('SALE');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [locations, setLocations] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (open && productId) {
+      loadLocations();
+    }
+  }, [open, productId]);
+
+  async function loadLocations() {
+    try {
+      const product = await fetchJSON(`/api/products`);
+      const currentProduct = product.find((p: any) => p.id === productId);
+      
+      if (currentProduct && currentProduct.stocklocation) {
+        const productLocations = currentProduct.stocklocation
+          .filter((sl: any) => sl.qty > 0)
+          .map((sl: any) => sl.location);
+        setLocations(productLocations || []);
+        if (productLocations && productLocations.length > 0 && !locationName) {
+          setLocationName(productLocations[0].name);
+        }
+      } else {
+        setLocations([]);
+        setLocationName('');
+      }
+    } catch (err) {
+      console.error('Failed to load locations:', err);
+      setLocations([]);
+    }
+  }
 
   if (!open) return null;
 
@@ -19,13 +50,30 @@ export default function ReduceStockModal({ open, onClose, productId, onDone }: {
     setLoading(true);
     try {
       await postJSON('/api/stock/out', { sku: undefined, productId, locationName, qty, refType });
+      toast.success(`✓ Removed ${qty} units from ${locationName}`, {
+        position: 'top-right',
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
       onDone?.();
       setQty(0);
-      setLocationName('Main');
+      setLocationName('');
       setRefType('SALE');
       onClose();
     } catch (err: any) {
-      setError(err?.message ?? 'Failed to reduce stock');
+      const errorMsg = err?.message ?? 'Failed to reduce stock';
+      setError(errorMsg);
+      toast.error(`✗ Error: ${errorMsg}`, {
+        position: 'top-right',
+        autoClose: 4000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
     } finally {
       setLoading(false);
     }
@@ -57,13 +105,18 @@ export default function ReduceStockModal({ open, onClose, productId, onDone }: {
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Location</label>
-            <input 
+            <label className="block text-sm font-medium text-gray-700 mb-2">Location *</label>
+            <select 
               value={locationName} 
-              onChange={e => setLocationName(e.target.value)} 
-              placeholder="e.g., Main" 
+              onChange={e => setLocationName(e.target.value)}
+              required
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+            >
+              <option value="">Select a location...</option>
+              {locations.map(loc => (
+                <option key={loc.id} value={loc.name}>{loc.name}</option>
+              ))}
+            </select>
           </div>
           
           <div>
