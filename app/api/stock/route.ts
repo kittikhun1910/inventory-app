@@ -74,7 +74,7 @@ async function handleIn(req: Request) {
 
     const updated = await prisma.product.findUnique({
       where: { id: productId },
-      include: { stockLocations: true, stockMovements: { orderBy: { createdAt: 'desc' } } },
+      include: { stocklocation: true, stockmovement: { orderBy: { createdAt: 'desc' } } },
     });
 
     return NextResponse.json({ success: true, product: updated });
@@ -121,7 +121,7 @@ async function handleOut(req: Request) {
 
     const updated = await prisma.product.findUnique({
       where: { id: productId },
-      include: { stockLocations: true, stockMovements: { orderBy: { createdAt: 'desc' } } },
+      include: { stocklocation: true, stockmovement: { orderBy: { createdAt: 'desc' } } },
     });
 
     return NextResponse.json({ success: true, product: updated });

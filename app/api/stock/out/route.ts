@@ -19,7 +19,7 @@ export async function POST(req: Request) {
     }
 
     // Get stock location
-    const stockLocation = await prisma.stockLocation.findUnique({
+    const stockLocation = await prisma.stocklocation.findUnique({
       where: {
         productId_locationId: {
           productId: Number(productId),
@@ -38,7 +38,7 @@ export async function POST(req: Request) {
     }
 
     // Update stock
-    const updated = await prisma.stockLocation.update({
+    const updated = await prisma.stocklocation.update({
       where: {
         productId_locationId: {
           productId: Number(productId),
@@ -51,7 +51,7 @@ export async function POST(req: Request) {
     });
 
     // Record stock movement
-    await prisma.stockMovement.create({
+    await prisma.stockmovement.create({
       data: {
         productId: Number(productId),
         type: 'OUT',

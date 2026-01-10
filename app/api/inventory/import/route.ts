@@ -60,7 +60,7 @@ export async function POST(req: Request) {
       }
 
       // Create or update stock location
-      const existingStock = await prisma.stockLocation.findUnique({
+      const existingStock = await prisma.stocklocation.findUnique({
         where: {
           productId_locationId: {
             productId: productRecord.id,
@@ -70,7 +70,7 @@ export async function POST(req: Request) {
       });
 
       if (!existingStock) {
-        await prisma.stockLocation.create({
+        await prisma.stocklocation.create({
           data: {
             productId: productRecord.id,
             locationId: locationRecord.id,

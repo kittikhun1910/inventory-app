@@ -1,10 +1,91 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+import { AlertTriangle } from 'lucide-react';
+import { fetchJSON } from '@/lib/api';
+
 export default function ReorderTab() {
+  const [products, setProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  async function load() {
+    setLoading(true);
+    try {
+      const data = await fetchJSON('/api/products');
+      // Filter products with stock below minimum
+      const lowStock = data.filter((p: any) => {
+        const totalStock = (p.stocklocation || []).reduce((sum: number, sl: any) => sum + (sl.qty || 0), 0);
+        return totalStock < p.minimumStock;
+      });
+      setProducts(lowStock || []);
+    } catch (err: any) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => { load(); }, []);
+
   return (
-    <div>
-      <h3>Reorder</h3>
-      <p>Placeholder — implement low-stock alerts and suggested reorder quantities here.</p>
+    <div className="space-y-6">
+      <div className="flex gap-2 items-center mb-4">
+        <AlertTriangle className="text-yellow-600" size={24} />
+        <h2 className="text-2xl font-bold text-gray-900">Reorder Alerts</h2>
+      </div>
+
+      {loading ? (
+        <div className="text-center py-12 text-gray-500">Loading...</div>
+      ) : products.length === 0 ? (
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-green-700">
+          ✓ All products are above minimum stock levels
+        </div>
+      ) : (
+        <div className="space-y-4">
+          <div className="text-sm text-gray-600 mb-4">
+            {products.length} product(s) below minimum stock level
+          </div>
+          
+          <div className="border border-gray-200 rounded-lg overflow-hidden">
+            <table className="w-full">
+              <thead className="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">SKU</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Product Name</th>
+                  <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700">Current Stock</th>
+                  <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700">Minimum Level</th>
+                  <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700">Shortage</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {products.map((product) => {
+                  const currentStock = (product.stocklocation || []).reduce((sum: number, sl: any) => sum + (sl.qty || 0), 0);
+                  const shortage = product.minimumStock - currentStock;
+                  return (
+                    <tr key={product.id} className="hover:bg-red-50">
+                      <td className="px-6 py-4 text-sm font-medium text-gray-900">{product.sku}</td>
+                      <td className="px-6 py-4 text-sm text-gray-700">{product.name}</td>
+                      <td className="px-6 py-4 text-sm text-center">
+                        <span className={`px-2 py-1 rounded font-semibold ${
+                          currentStock === 0 ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'
+                        }`}>
+                          {currentStock}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-center text-gray-600">{product.minimumStock}</td>
+                      <td className="px-6 py-4 text-sm text-center">
+                        <span className="px-2 py-1 rounded bg-red-100 text-red-700 font-semibold">
+                          {shortage}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

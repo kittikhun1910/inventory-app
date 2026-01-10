@@ -65,7 +65,7 @@ export async function DELETE(req: Request) {
 
     if (!loc) return NextResponse.json({ error: 'Location not found' }, { status: 404 });
 
-    const existingStock = await prisma.stockLocation.findFirst({ where: { locationId: loc.id } });
+    const existingStock = await prisma.stocklocation.findFirst({ where: { locationId: loc.id } });
     if (existingStock)
       return NextResponse.json({ error: 'Cannot delete location with stock present' }, { status: 400 });
 
