@@ -36,6 +36,10 @@ export default function StockTab() {
 
   const filtered = products.filter(p => p.sku?.toLowerCase().includes(q.toLowerCase()) || p.name?.toLowerCase().includes(q.toLowerCase()));
 
+  const getStockAtLocation = (stocklocations: any[]) => {
+    return (stocklocations || []).reduce((sum: number, sl: any) => sum + (sl.qty || 0), 0);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap gap-3 items-center">
@@ -69,39 +73,59 @@ export default function StockTab() {
             <tr>
               <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 min-w-24">SKU</th>
               <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 min-w-48">ชื่อผลิตภัณฑ์</th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 min-w-32">บาร์โค้ด</th>
-              <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700 min-w-20">สต๊อกขั้นต่ำ</th>
+              {/* <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 min-w-32">บาร์โค้ด</th> */}
+              <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700 min-w-24">ราคาขาย</th>
+              <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700 min-w-24">สต๊อกปัจจุบัน</th>
+              {/* <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700 min-w-24">สต๊อกขั้นต่ำ</th> */}
+              <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700 min-w-24">สถานะ</th>
               <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700 min-w-40">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
             {loading ? (
-              <tr><td colSpan={5} className="px-4 py-12 text-center text-gray-500">กำลังโหลด....</td></tr>
+              <tr><td colSpan={8} className="px-4 py-12 text-center text-gray-500">กำลังโหลด....</td></tr>
             ) : filtered.length === 0 ? (
-              <tr><td colSpan={5} className="px-4 py-12 text-center text-gray-500">ไม่พบสินค้า</td></tr>
+              <tr><td colSpan={8} className="px-4 py-12 text-center text-gray-500">ไม่พบสินค้า</td></tr>
             ) : (
-              filtered.map(p => (
-                <tr key={p.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-4 py-4 text-sm font-semibold text-gray-900 whitespace-nowrap">{p.sku}</td>
-                  <td className="px-4 py-4 text-sm text-gray-700">{p.name}</td>
-                  <td className="px-4 py-4 text-sm text-gray-600">{p.barcode || '-'}</td>
-                  <td className="px-4 py-4 text-sm text-center text-gray-600 whitespace-nowrap">{p.minimumStock}</td>
-                  <td className="px-4 py-4 text-right space-x-2 whitespace-nowrap">
-                    <button 
-                      onClick={() => { setSelectedProduct(p); setShowAddStock(true); }}
-                      className="px-3 py-1 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded text-xs font-medium transition-colors"
-                    >
-                      + Stock
-                    </button>
-                    <button 
-                      onClick={() => { setSelectedProduct(p); setShowReduceStock(true); }}
-                      className="px-3 py-1 bg-red-100 hover:bg-red-200 text-red-700 rounded text-xs font-medium transition-colors"
-                    >
-                      - Stock
-                    </button>
-                  </td>
-                </tr>
-              ))
+              filtered.map(p => {
+                const currentStock = getStockAtLocation(p.stocklocation);
+                const isLowStock = currentStock < p.minimumStock;
+                return (
+                  <tr key={p.id} className={`hover:bg-gray-50 transition-colors ${isLowStock ? 'bg-red-50' : ''}`}>
+                    <td className="px-4 py-4 text-sm font-semibold text-gray-900 whitespace-nowrap">{p.sku}</td>
+                    <td className="px-4 py-4 text-sm text-gray-700">{p.name}</td>
+                    {/* <td className="px-4 py-4 text-sm text-gray-600">{p.barcode || '-'}</td> */}
+                    <td className="px-4 py-4 text-sm text-center text-gray-900 font-medium">${p.sellingPrice || 0}</td>
+                    <td className="px-4 py-4 text-sm text-center text-gray-600 font-medium">{currentStock}</td>
+                    {/* <td className="px-4 py-4 text-sm text-center text-gray-600">{p.minimumStock}</td> */}
+                    <td className="px-4 py-4 text-sm text-center">
+                      <span className={`px-2 py-1 rounded text-xs font-semibold ${
+                        currentStock === 0 
+                          ? 'bg-red-100 text-red-700' 
+                          : isLowStock 
+                          ? 'bg-yellow-100 text-yellow-700' 
+                          : 'bg-green-100 text-green-700'
+                      }`}>
+                        {currentStock === 0 ? 'หมด' : isLowStock ? 'ต่ำ' : 'ปกติ'}
+                      </span>
+                    </td>
+                    <td className="px-4 py-4 text-right space-x-2 whitespace-nowrap">
+                      <button 
+                        onClick={() => { setSelectedProduct(p); setShowAddStock(true); }}
+                        className="px-3 py-1 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded text-xs font-medium transition-colors"
+                      >
+                        เพิ่มสต๊อก
+                      </button>
+                      <button 
+                        onClick={() => { setSelectedProduct(p); setShowReduceStock(true); }}
+                        className="px-3 py-1 bg-red-100 hover:bg-red-200 text-red-700 rounded text-xs font-medium transition-colors"
+                      >
+                        ลดสต๊อก
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>
