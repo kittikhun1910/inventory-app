@@ -9,7 +9,7 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { sku, name, barcode, minimumStock } = body ?? {};
+    const { sku, name, barcode, sellingPrice, minimumStock } = body ?? {};
 
     if (!sku || !name)
       return NextResponse.json({ error: 'Both "sku" and "name" are required' }, { status: 400 });
@@ -36,7 +36,7 @@ export async function POST(req: Request) {
 export async function PUT(req: Request) {
   try {
     const body = await req.json();
-    const { id, sku, name, barcode, minimumStock } = body ?? {};
+    const { id, sku, name, barcode, sellingPrice, minimumStock } = body ?? {};
 
     if (!id) return NextResponse.json({ error: '"id" is required' }, { status: 400 });
 

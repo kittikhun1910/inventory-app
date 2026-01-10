@@ -18,6 +18,7 @@ model product {
   sku           String          @unique(map: "Product_sku_key")
   name          String
   barcode       String?
+  sellingPrice  Float           @default(0)
   minimumStock  Int             @default(0)
   createdAt     DateTime        @default(now())
   stocklocation stocklocation[]

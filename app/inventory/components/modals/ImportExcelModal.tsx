@@ -1,18 +1,24 @@
 'use client';
 
 import { useState } from 'react';
+import { X, AlertCircle, CheckCircle } from 'lucide-react';
 import { postForm } from '@/lib/api';
 
 export default function ImportExcelModal({ open, onClose, onDone }: { open: boolean; onClose: () => void; onDone?: () => void }) {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
+  const [error, setError] = useState('');
 
   if (!open) return null;
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!file) return alert('Select a file');
+    if (!file) {
+      setError('Please select a file');
+      return;
+    }
+    setError('');
     setLoading(true);
     try {
       const form = new FormData();
@@ -21,35 +27,104 @@ export default function ImportExcelModal({ open, onClose, onDone }: { open: bool
       setResult(res);
       onDone?.();
     } catch (err: any) {
-      alert('Error: ' + String(err?.message ?? err));
+      setError(err?.message ?? 'Import failed');
     } finally {
       setLoading(false);
     }
   };
 
-  return (
-    <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.4)' }}>
-      <form onSubmit={submit} style={{ background: '#fff', padding: 20, borderRadius: 6, minWidth: 420 }}>
-        <h3>Import Excel</h3>
-        <div style={{ display: 'grid', gap: 8, marginTop: 8 }}>
-          <input type="file" accept=".xlsx,.xls" onChange={e => setFile(e.target.files ? e.target.files[0] : null)} />
-          <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-            <button type="button" onClick={onClose} disabled={loading}>Cancel</button>
-            <button type="submit" disabled={loading}>{loading ? 'Importing...' : 'Import'}</button>
-          </div>
+  const handleClose = () => {
+    setFile(null);
+    setResult(null);
+    setError('');
+    onClose();
+  };
 
-          {result && (
-            <div style={{ marginTop: 8 }}>
-              <strong>Imported: {result.imported} / {result.total}</strong>
-              <ul style={{ maxHeight: 200, overflow: 'auto' }}>
-                {result.results.map((r: any) => (
-                  <li key={r.row} style={{ color: r.success ? 'green' : 'red' }}>{`Row ${r.row}: ${r.success ? 'OK' : r.message}`}</li>
-                ))}
-              </ul>
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full mx-4 max-h-96 overflow-y-auto">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 sticky top-0 bg-white">
+          <h2 className="text-xl font-semibold text-gray-900">Import Excel</h2>
+          <button onClick={handleClose} className="text-gray-400 hover:text-gray-600">
+            <X size={24} />
+          </button>
+        </div>
+        
+        <form onSubmit={submit} className="p-6 space-y-4">
+          {error && (
+            <div className="flex gap-3 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <AlertCircle className="text-red-700 flex-shrink-0" size={20} />
+              <div className="text-red-700 text-sm">{error}</div>
             </div>
           )}
-        </div>
-      </form>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Select File</label>
+            <input 
+              type="file" 
+              accept=".xlsx,.xls,.csv" 
+              onChange={e => setFile(e.target.files ? e.target.files[0] : null)}
+              disabled={loading}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <p className="text-xs text-gray-500 mt-2">Expected columns: A: SKU, B: Product Name, C: Selling Price, D: Location</p>
+          </div>
+          
+          {!result && (
+            <div className="flex gap-3 justify-end pt-4">
+              <button 
+                type="button" 
+                onClick={handleClose} 
+                disabled={loading}
+                className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 disabled:bg-gray-100 rounded-lg font-medium transition-colors"
+              >
+                Cancel
+              </button>
+              <button 
+                type="submit" 
+                disabled={loading || !file}
+                className="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white rounded-lg font-medium transition-colors"
+              >
+                {loading ? 'Importing...' : 'Import'}
+              </button>
+            </div>
+          )}
+
+          {result && (
+            <div className="space-y-4">
+              <div className="flex gap-3 p-4 bg-green-50 border border-green-200 rounded-lg">
+                <CheckCircle className="text-green-700 flex-shrink-0" size={20} />
+                <div>
+                  <p className="font-semibold text-green-900">Import Complete</p>
+                  <p className="text-sm text-green-700">Imported {result.imported || 0} items</p>
+                </div>
+              </div>
+              
+              {result.results && result.results.length > 0 && (
+                <div>
+                  <h4 className="font-semibold text-gray-900 mb-2">Details</h4>
+                  <div className="space-y-1 max-h-32 overflow-y-auto">
+                    {result.results.map((r: any, idx: number) => (
+                      <div key={idx} className={`text-sm flex gap-2 ${r.success ? 'text-green-700' : 'text-red-700'}`}>
+                        {r.success ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
+                        <span>{`Row ${r.row}: ${r.success ? 'OK' : r.message}`}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              <button 
+                type="button" 
+                onClick={handleClose}
+                className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          )}
+        </form>
+      </div>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { X } from 'lucide-react';
 import { postJSON } from '@/lib/api';
 
 export default function AddStockModal({ open, onClose, productId, onDone }: { open: boolean; onClose: () => void; productId?: number; onDone?: () => void }) {
@@ -8,41 +9,94 @@ export default function AddStockModal({ open, onClose, productId, onDone }: { op
   const [locationName, setLocationName] = useState('Main');
   const [refType, setRefType] = useState('MANUAL');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   if (!open) return null;
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
     setLoading(true);
     try {
       await postJSON('/api/stock/in', { sku: undefined, productId, locationName, qty, refType });
       onDone?.();
+      setQty(0);
+      setLocationName('Main');
+      setRefType('MANUAL');
       onClose();
-      alert('Stock increased');
     } catch (err: any) {
-      alert('Error: ' + String(err?.message ?? err));
+      setError(err?.message ?? 'Failed to add stock');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.4)' }}>
-      <form onSubmit={submit} style={{ background: '#fff', padding: 20, borderRadius: 6, minWidth: 360 }}>
-        <h3>Add Stock</h3>
-        <div style={{ display: 'grid', gap: 8, marginTop: 8 }}>
-          <input type="number" required value={qty} onChange={e => setQty(Number(e.target.value))} placeholder="Quantity" />
-          <input value={locationName} onChange={e => setLocationName(e.target.value)} placeholder="Location name" />
-          <select value={refType} onChange={e => setRefType(e.target.value)}>
-            <option value="MANUAL">MANUAL</option>
-            <option value="IMPORT">IMPORT</option>
-          </select>
-          <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-            <button type="button" onClick={onClose} disabled={loading}>Cancel</button>
-            <button type="submit" disabled={loading}>{loading ? 'Saving...' : 'Add'}</button>
-          </div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="bg-white rounded-lg shadow-lg max-w-md w-full mx-4">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+          <h2 className="text-xl font-semibold text-gray-900">Add Stock</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+            <X size={24} />
+          </button>
         </div>
-      </form>
+        
+        <form onSubmit={submit} className="p-6 space-y-4">
+          {error && <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">{error}</div>}
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Quantity *</label>
+            <input 
+              type="number" 
+              required 
+              value={qty} 
+              onChange={e => setQty(Number(e.target.value))} 
+              placeholder="0" 
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Location</label>
+            <input 
+              value={locationName} 
+              onChange={e => setLocationName(e.target.value)} 
+              placeholder="e.g., Main" 
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Reference Type</label>
+            <select 
+              value={refType} 
+              onChange={e => setRefType(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="MANUAL">Manual</option>
+              <option value="IMPORT">Import</option>
+            </select>
+          </div>
+          
+          <div className="flex gap-3 justify-end pt-4">
+            <button 
+              type="button" 
+              onClick={onClose} 
+              disabled={loading}
+              className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 disabled:bg-gray-100 rounded-lg font-medium transition-colors"
+            >
+              Cancel
+            </button>
+            <button 
+              type="submit" 
+              disabled={loading}
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-lg font-medium transition-colors"
+            >
+              {loading ? 'Adding...' : 'Add Stock'}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

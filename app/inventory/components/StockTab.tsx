@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { Plus, Upload, RotateCcw } from 'lucide-react';
 import { fetchJSON } from '@/lib/api';
 import SearchBar from './SearchBar';
 import AddProductModal from './modals/AddProductModal';
@@ -36,40 +37,68 @@ export default function StockTab() {
   const filtered = products.filter(p => p.sku?.toLowerCase().includes(q.toLowerCase()) || p.name?.toLowerCase().includes(q.toLowerCase()));
 
   return (
-    <div>
-      <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 12 }}>
-        <SearchBar value={q} onChange={setQ} />
-        <button onClick={() => setShowAddProduct(true)}>Add Product</button>
-        <button onClick={() => setShowImport(true)}>Import Excel</button>
-        <button onClick={load}>Refresh</button>
+    <div className="space-y-6">
+      <div className="flex flex-wrap gap-3 items-center">
+        <div className="flex-1 min-w-64">
+          <SearchBar value={q} onChange={setQ} />
+        </div>
+        <button 
+          onClick={() => setShowAddProduct(true)}
+          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
+        >
+          <Plus size={18} /> Add Product
+        </button>
+        <button 
+          onClick={() => setShowImport(true)}
+          className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors"
+        >
+          <Upload size={18} /> Import Excel
+        </button>
+        <button 
+          onClick={load}
+          disabled={loading}
+          className="inline-flex items-center gap-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 disabled:bg-gray-400 text-white rounded-lg font-medium transition-colors"
+        >
+          <RotateCcw size={18} /> Refresh
+        </button>
       </div>
 
-      <div style={{ border: '1px solid #eee', borderRadius: 8, overflow: 'hidden' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead style={{ background: '#fafafa' }}>
+      <div className="border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+        <table className="w-full border-collapse">
+          <thead className="bg-gray-50 border-b border-gray-200">
             <tr>
-              <th style={{ padding: 8, textAlign: 'left' }}>SKU</th>
-              <th style={{ padding: 8, textAlign: 'left' }}>Name</th>
-              <th style={{ padding: 8, textAlign: 'left' }}>Barcode</th>
-              <th style={{ padding: 8, textAlign: 'center' }}>Min</th>
-              <th style={{ padding: 8, textAlign: 'right' }}>Actions</th>
+              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">SKU</th>
+              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Product Name</th>
+              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Barcode</th>
+              <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700">Min Stock</th>
+              <th className="px-6 py-3 text-right text-sm font-semibold text-gray-700">Actions</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-gray-200">
             {loading ? (
-              <tr><td colSpan={5} style={{ padding: 16 }}>Loading...</td></tr>
+              <tr><td colSpan={6} className="px-6 py-12 text-center text-gray-500">Loading...</td></tr>
             ) : filtered.length === 0 ? (
-              <tr><td colSpan={5} style={{ padding: 16 }}>No products found</td></tr>
+              <tr><td colSpan={6} className="px-6 py-12 text-center text-gray-500">No products found</td></tr>
             ) : (
               filtered.map(p => (
-                <tr key={p.id} style={{ borderTop: '1px solid #f3f4f6' }}>
-                  <td style={{ padding: 8 }}>{p.sku}</td>
-                  <td style={{ padding: 8 }}>{p.name}</td>
-                  <td style={{ padding: 8 }}>{p.barcode || '-'}</td>
-                  <td style={{ padding: 8, textAlign: 'center' }}>{p.minimumStock}</td>
-                  <td style={{ padding: 8, textAlign: 'right' }}>
-                    <button onClick={() => { setSelectedProduct(p); setShowAddStock(true); }}>Add Stock</button>
-                    <button onClick={() => { setSelectedProduct(p); setShowReduceStock(true); }} style={{ marginLeft: 8 }}>Reduce</button>
+                <tr key={p.id} className="hover:bg-gray-50 transition-colors">
+                  <td className="px-6 py-4 text-sm font-medium text-gray-900">{p.sku}</td>
+                  <td className="px-6 py-4 text-sm text-gray-700">{p.name}</td>
+                  <td className="px-6 py-4 text-sm text-gray-600">{p.barcode || '-'}</td>
+                  <td className="px-6 py-4 text-sm text-center text-gray-600">{p.minimumStock}</td>
+                  <td className="px-6 py-4 text-right space-x-2">
+                    <button 
+                      onClick={() => { setSelectedProduct(p); setShowAddStock(true); }}
+                      className="px-3 py-1 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded text-sm font-medium transition-colors"
+                    >
+                      + Stock
+                    </button>
+                    <button 
+                      onClick={() => { setSelectedProduct(p); setShowReduceStock(true); }}
+                      className="px-3 py-1 bg-red-100 hover:bg-red-200 text-red-700 rounded text-sm font-medium transition-colors"
+                    >
+                      - Stock
+                    </button>
                   </td>
                 </tr>
               ))
