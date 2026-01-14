@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { MapPin, Package, Search, ShoppingCart, Filter, Grid, List, AlertTriangle, CheckCircle } from 'lucide-react';
+import { MapPin, Package, Search, ShoppingCart, Filter, Grid, List, AlertTriangle, CheckCircle, Store, Warehouse, Eye, EyeOff } from 'lucide-react';
 import Link from 'next/link';
 import { fetchJSON } from '@/lib/api';
 
@@ -24,10 +24,12 @@ interface Product {
 
 export default function StorePage() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [locations, setLocations] = useState<Array<{id: number, name: string}>>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [filterStatus, setFilterStatus] = useState<'all' | 'in-stock' | 'low-stock' | 'out-of-stock'>('all');
+  const [filterLocation, setFilterLocation] = useState<string>('all');
 
   useEffect(() => {
     loadProducts();
@@ -169,71 +171,136 @@ export default function StorePage() {
               return (
                 <div
                   key={product.id}
-                  className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
+                  className="group bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-xl hover:border-gray-300 transition-all duration-300 transform hover:-translate-y-1"
                 >
+                  {/* Status Banner */}
+                  <div className={`h-2 ${
+                    totalStock === 0 ? 'bg-red-500' :
+                    totalStock < product.minimumStock ? 'bg-yellow-500' : 'bg-green-500'
+                  }`} />
+
                   <div className="p-6">
+                    {/* Header */}
                     <div className="flex justify-between items-start mb-4">
-                      <div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                      <div className="flex-1">
+                        <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
                           {product.name}
                         </h3>
-                        <p className="text-sm text-gray-600">SKU: {product.sku}</p>
+                        <div className="flex items-center space-x-3">
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                            SKU: {product.sku}
+                          </span>
+                          {product.barcode && (
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                              {product.barcode}
+                            </span>
+                          )}
+                        </div>
                       </div>
-                      <div className="text-right">
-                        <p className="text-lg font-bold text-green-600">
+                      <div className="text-right ml-4">
+                        <div className="text-2xl font-bold text-green-600 mb-1">
                           ${product.sellingPrice}
-                        </p>
+                        </div>
+                        <div className="text-xs text-gray-500">per unit</div>
                       </div>
                     </div>
 
-                    <div className="mb-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm text-gray-600">Total Stock:</span>
-                        <span className={`text-sm font-medium ${
-                          totalStock === 0 ? 'text-red-600' :
-                          totalStock < product.minimumStock ? 'text-yellow-600' : 'text-green-600'
+                    {/* Stock Overview */}
+                    <div className="bg-gray-50 rounded-lg p-4 mb-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center space-x-2">
+                          <Package className="h-5 w-5 text-gray-600" />
+                          <span className="font-medium text-gray-900">Stock Overview</span>
+                        </div>
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          totalStock === 0 ? 'bg-red-100 text-red-800' :
+                          totalStock < product.minimumStock ? 'bg-yellow-100 text-yellow-800' :
+                          'bg-green-100 text-green-800'
                         }`}>
-                          {totalStock} units
+                          {totalStock === 0 ? 'Out of Stock' :
+                           totalStock < product.minimumStock ? 'Low Stock' : 'In Stock'}
                         </span>
                       </div>
+
+                      <div className="grid grid-cols-2 gap-4 text-center">
+                        <div className="bg-white rounded-lg p-3 border">
+                          <div className={`text-2xl font-bold ${
+                            totalStock === 0 ? 'text-red-600' :
+                            totalStock < product.minimumStock ? 'text-yellow-600' : 'text-green-600'
+                          }`}>
+                            {totalStock}
+                          </div>
+                          <div className="text-xs text-gray-600">Total Units</div>
+                        </div>
+                        <div className="bg-white rounded-lg p-3 border">
+                          <div className="text-2xl font-bold text-blue-600">
+                            {product.minimumStock}
+                          </div>
+                          <div className="text-xs text-gray-600">Min Required</div>
+                        </div>
+                      </div>
                     </div>
 
-                    <div className="border-t border-gray-100 pt-4">
-                      <div className="flex items-center mb-2">
-                        <MapPin className="h-4 w-4 text-gray-400 mr-2" />
-                        <span className="text-sm font-medium text-gray-700">Locations:</span>
+                    {/* Locations */}
+                    <div className="space-y-3">
+                      <div className="flex items-center space-x-2">
+                        <Warehouse className="h-5 w-5 text-gray-600" />
+                        <span className="font-medium text-gray-900">Warehouse Locations</span>
+                        <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                          {product.stocklocation.length} location{product.stocklocation.length !== 1 ? 's' : ''}
+                        </span>
                       </div>
+
                       {product.stocklocation.length === 0 ? (
-                        <p className="text-sm text-gray-500 italic">No stock locations</p>
+                        <div className="bg-gray-50 rounded-lg p-4 text-center">
+                          <MapPin className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                          <p className="text-sm text-gray-600">No warehouse locations assigned</p>
+                        </div>
                       ) : (
-                        <div className="space-y-1">
+                        <div className="space-y-2">
                           {product.stocklocation.map((sl) => (
-                            <div key={sl.id} className="flex justify-between items-center text-sm">
-                              <span className="text-gray-600">{sl.location.name}</span>
-                              <span className={`font-medium ${
-                                sl.qty === 0 ? 'text-red-600' : 'text-gray-900'
-                              }`}>
-                                {sl.qty} units
-                              </span>
+                            <div key={sl.id} className="flex items-center justify-between bg-gray-50 rounded-lg p-3">
+                              <div className="flex items-center space-x-3">
+                                <div className="flex items-center justify-center w-8 h-8 bg-blue-100 rounded-full">
+                                  <Store className="h-4 w-4 text-blue-600" />
+                                </div>
+                                <div>
+                                  <p className="font-medium text-gray-900">{sl.location.name}</p>
+                                  <p className="text-xs text-gray-600">Warehouse</p>
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <div className={`text-lg font-bold ${
+                                  sl.qty === 0 ? 'text-red-600' :
+                                  sl.qty < product.minimumStock ? 'text-yellow-600' : 'text-green-600'
+                                }`}>
+                                  {sl.qty}
+                                </div>
+                                <div className="text-xs text-gray-500">units</div>
+                              </div>
                             </div>
                           ))}
                         </div>
                       )}
                     </div>
 
-                    <div className="mt-4 pt-4 border-t border-gray-100">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs text-gray-500">
-                          Min Stock: {product.minimumStock}
-                        </span>
-                        <span className={`text-xs px-2 py-1 rounded ${
-                          totalStock === 0 ? 'bg-red-100 text-red-700' :
-                          totalStock < product.minimumStock ? 'bg-yellow-100 text-yellow-700' :
-                          'bg-green-100 text-green-700'
-                        }`}>
-                          {totalStock === 0 ? 'Out of Stock' :
-                           totalStock < product.minimumStock ? 'Low Stock' : 'In Stock'}
-                        </span>
+                    {/* Quick Actions for Admin */}
+                    <div className="mt-6 pt-4 border-t border-gray-100">
+                      <div className="flex space-x-2">
+                        <Link
+                          href={`/inventory/stock`}
+                          className="flex-1 inline-flex items-center justify-center px-3 py-2 text-xs font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
+                        >
+                          <Eye className="h-3 w-3 mr-1" />
+                          View Details
+                        </Link>
+                        <button
+                          onClick={() => window.open(`/inventory`, '_blank')}
+                          className="flex-1 inline-flex items-center justify-center px-3 py-2 text-xs font-medium text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
+                        >
+                          <Package className="h-3 w-3 mr-1" />
+                          Manage Stock
+                        </button>
                       </div>
                     </div>
                   </div>
