@@ -5,6 +5,7 @@ import { Plus, Upload, RotateCcw, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { fetchJSON } from '@/lib/api';
 import SearchBar from '../components/SearchBar';
+import Pagination from '../components/Pagination';
 import AddProductModal from '../components/modals/AddProductModal';
 import AddStockModal from '../components/modals/AddStockModal';
 import ReduceStockModal from '../components/modals/ReduceStockModal';
@@ -19,6 +20,8 @@ export default function StockPage() {
   const [showAddStock, setShowAddStock] = useState(false);
   const [showReduceStock, setShowReduceStock] = useState(false);
   const [showImport, setShowImport] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(20);
 
   async function load() {
     setLoading(true);
@@ -35,7 +38,16 @@ export default function StockPage() {
 
   useEffect(() => { load(); }, []);
 
+  useEffect(() => {
+    setCurrentPage(1); // Reset to first page when search changes
+  }, [q]);
+
   const filtered = products.filter(p => p.sku?.toLowerCase().includes(q.toLowerCase()) || p.name?.toLowerCase().includes(q.toLowerCase()));
+
+  // Paginate the filtered results
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedProducts = filtered.slice(startIndex, endIndex);
 
   const getStockAtLocation = (stocklocations: any[]) => {
     return (stocklocations || []).reduce((sum: number, sl: any) => sum + (sl.qty || 0), 0);
@@ -132,7 +144,7 @@ export default function StockPage() {
                 ) : filtered.length === 0 ? (
                   <tr><td colSpan={7} className="px-6 py-12 text-center text-gray-500">No products found</td></tr>
                 ) : (
-                  filtered.map(p => {
+                  paginatedProducts.map(p => {
                     const currentStock = getStockAtLocation(p.stocklocation);
                     const isLowStock = currentStock < p.minimumStock;
                     const stockByLocation = getStockByLocation(p.stocklocation);
@@ -188,6 +200,20 @@ export default function StockPage() {
             </table>
           </div>
         </div>
+
+        {/* Pagination */}
+        {!loading && filtered.length > 0 && (
+          <Pagination
+            currentPage={currentPage}
+            totalItems={filtered.length}
+            itemsPerPage={itemsPerPage}
+            onPageChange={setCurrentPage}
+            onItemsPerPageChange={(newItemsPerPage) => {
+              setItemsPerPage(newItemsPerPage);
+              setCurrentPage(1); // Reset to first page when changing items per page
+            }}
+          />
+        )}
 
         {/* Modals */}
         <AddProductModal open={showAddProduct} onClose={() => setShowAddProduct(false)} onCreated={load} />

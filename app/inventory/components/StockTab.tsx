@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Plus, Upload, RotateCcw } from 'lucide-react';
 import { fetchJSON } from '@/lib/api';
 import SearchBar from './SearchBar';
+import Pagination from './Pagination';
 import AddProductModal from './modals/AddProductModal';
 import AddStockModal from './modals/AddStockModal';
 import ReduceStockModal from './modals/ReduceStockModal';
@@ -18,6 +19,8 @@ export default function StockTab() {
   const [showAddStock, setShowAddStock] = useState(false);
   const [showReduceStock, setShowReduceStock] = useState(false);
   const [showImport, setShowImport] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(20);
 
   async function load() {
     setLoading(true);
@@ -34,7 +37,16 @@ export default function StockTab() {
 
   useEffect(() => { load(); }, []);
 
+  useEffect(() => {
+    setCurrentPage(1); // Reset to first page when search changes
+  }, [q]);
+
   const filtered = products.filter(p => p.sku?.toLowerCase().includes(q.toLowerCase()) || p.name?.toLowerCase().includes(q.toLowerCase()));
+
+  // Paginate the filtered results
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedProducts = filtered.slice(startIndex, endIndex);
 
   const getStockAtLocation = (stocklocations: any[]) => {
     return (stocklocations || []).reduce((sum: number, sl: any) => sum + (sl.qty || 0), 0);
@@ -91,11 +103,11 @@ export default function StockTab() {
           </thead>
           <tbody className="divide-y divide-gray-200">
             {loading ? (
-              <tr><td colSpan={8} className="px-4 py-12 text-center text-gray-500">กำลังโหลด....</td></tr>
+              <tr><td colSpan={6} className="px-4 py-12 text-center text-gray-500">กำลังโหลด....</td></tr>
             ) : filtered.length === 0 ? (
-              <tr><td colSpan={8} className="px-4 py-12 text-center text-gray-500">ไม่พบสินค้า</td></tr>
+              <tr><td colSpan={6} className="px-4 py-12 text-center text-gray-500">ไม่พบสินค้า</td></tr>
             ) : (
-              filtered.map(p => {
+              paginatedProducts.map(p => {
                 const currentStock = getStockAtLocation(p.stocklocation);
                 const isLowStock = currentStock < p.minimumStock;
                 const stockByLocation = getStockByLocation(p.stocklocation);
@@ -148,6 +160,20 @@ export default function StockTab() {
           </tbody>
         </table>
       </div>
+
+      {/* Pagination */}
+      {!loading && filtered.length > 0 && (
+        <Pagination
+          currentPage={currentPage}
+          totalItems={filtered.length}
+          itemsPerPage={itemsPerPage}
+          onPageChange={setCurrentPage}
+          onItemsPerPageChange={(newItemsPerPage) => {
+            setItemsPerPage(newItemsPerPage);
+            setCurrentPage(1); // Reset to first page when changing items per page
+          }}
+        />
+      )}
 
       <AddProductModal open={showAddProduct} onClose={() => setShowAddProduct(false)} onCreated={load} />
       <AddStockModal open={showAddStock} onClose={() => setShowAddStock(false)} productId={selectedProduct?.id} onDone={load} />

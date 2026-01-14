@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { ArrowLeft, TrendingUp, AlertTriangle, BarChart3, Package, ShoppingCart, Calendar, Download, Filter, RefreshCw, DollarSign, Activity, Zap } from 'lucide-react';
 import Link from 'next/link';
 import { fetchJSON } from '@/lib/api';
+import Pagination from '../components/Pagination';
 
 interface Product {
   id: number;
@@ -48,6 +49,12 @@ export default function ReportsPage() {
   const [timeRange, setTimeRange] = useState<TimeRange>('week');
   const [customStartDate, setCustomStartDate] = useState('');
   const [customEndDate, setCustomEndDate] = useState('');
+
+  // Pagination states
+  const [movementsCurrentPage, setMovementsCurrentPage] = useState(1);
+  const [movementsItemsPerPage, setMovementsItemsPerPage] = useState(20);
+  const [performanceCurrentPage, setPerformanceCurrentPage] = useState(1);
+  const [performanceItemsPerPage, setPerformanceItemsPerPage] = useState(10);
 
   useEffect(() => {
     loadData();
@@ -164,6 +171,16 @@ export default function ReportsPage() {
       turnover: currentStock > 0 ? sold / currentStock : 0,
     };
   }).sort((a, b) => b.revenue - a.revenue);
+
+  // Paginate movements
+  const movementsStartIndex = (movementsCurrentPage - 1) * movementsItemsPerPage;
+  const movementsEndIndex = movementsStartIndex + movementsItemsPerPage;
+  const paginatedMovements = movements.slice(movementsStartIndex, movementsEndIndex);
+
+  // Paginate product performance
+  const performanceStartIndex = (performanceCurrentPage - 1) * performanceItemsPerPage;
+  const performanceEndIndex = performanceStartIndex + performanceItemsPerPage;
+  const paginatedPerformance = productPerformance.slice(performanceStartIndex, performanceEndIndex);
 
   const formatCurrency = (amount: number) => `$${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   const formatDate = (dateString: string) => new Date(dateString).toLocaleDateString();
@@ -340,7 +357,7 @@ export default function ReportsPage() {
                         </td>
                       </tr>
                     ) : (
-                      movements.slice(0, 20).map(movement => (
+                      paginatedMovements.map(movement => (
                         <tr key={movement.id} className="hover:bg-gray-50">
                           <td className="px-6 py-4 text-sm text-gray-900">
                             {formatDate(movement.createdAt)}
@@ -380,6 +397,20 @@ export default function ReportsPage() {
                   </tbody>
                 </table>
               </div>
+
+              {/* Pagination for Stock Movements */}
+              {!loading && movements.length > 0 && (
+                <Pagination
+                  currentPage={movementsCurrentPage}
+                  totalItems={movements.length}
+                  itemsPerPage={movementsItemsPerPage}
+                  onPageChange={setMovementsCurrentPage}
+                  onItemsPerPageChange={(newItemsPerPage) => {
+                    setMovementsItemsPerPage(newItemsPerPage);
+                    setMovementsCurrentPage(1); // Reset to first page when changing items per page
+                  }}
+                />
+              )}
             </div>
 
             {/* Product Performance */}
@@ -415,7 +446,7 @@ export default function ReportsPage() {
                         </td>
                       </tr>
                     ) : (
-                      productPerformance.slice(0, 10).map(product => (
+                      paginatedPerformance.map(product => (
                         <tr key={product.id} className="hover:bg-gray-50">
                           <td className="px-6 py-4">
                             <div>
@@ -446,6 +477,20 @@ export default function ReportsPage() {
                   </tbody>
                 </table>
               </div>
+
+              {/* Pagination for Product Performance */}
+              {!loading && productPerformance.length > 0 && (
+                <Pagination
+                  currentPage={performanceCurrentPage}
+                  totalItems={productPerformance.length}
+                  itemsPerPage={performanceItemsPerPage}
+                  onPageChange={setPerformanceCurrentPage}
+                  onItemsPerPageChange={(newItemsPerPage) => {
+                    setPerformanceItemsPerPage(newItemsPerPage);
+                    setPerformanceCurrentPage(1); // Reset to first page when changing items per page
+                  }}
+                />
+              )}
             </div>
           </div>
 
