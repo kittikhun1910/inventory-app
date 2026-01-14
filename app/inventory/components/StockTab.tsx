@@ -40,6 +40,14 @@ export default function StockTab() {
     return (stocklocations || []).reduce((sum: number, sl: any) => sum + (sl.qty || 0), 0);
   };
 
+  const getStockByLocation = (stocklocations: any[]) => {
+    return (stocklocations || []).map(sl => ({
+      location: sl.location.name,
+      qty: sl.qty,
+      locationId: sl.locationId
+    }));
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap gap-3 items-center">
@@ -90,33 +98,43 @@ export default function StockTab() {
               filtered.map(p => {
                 const currentStock = getStockAtLocation(p.stocklocation);
                 const isLowStock = currentStock < p.minimumStock;
+                const stockByLocation = getStockByLocation(p.stocklocation);
                 return (
                   <tr key={p.id} className={`hover:bg-gray-50 transition-colors ${isLowStock ? 'bg-red-50' : ''}`}>
                     <td className="px-4 py-4 text-sm font-semibold text-gray-900 whitespace-nowrap">{p.sku}</td>
                     <td className="px-4 py-4 text-sm text-gray-700">{p.name}</td>
                     {/* <td className="px-4 py-4 text-sm text-gray-600">{p.barcode || '-'}</td> */}
                     <td className="px-4 py-4 text-sm text-center text-gray-900 font-medium">${p.sellingPrice || 0}</td>
-                    <td className="px-4 py-4 text-sm text-center text-gray-600 font-medium">{currentStock}</td>
+                    <td className="px-4 py-4 text-sm text-center text-gray-600 font-medium">
+                      <div>{currentStock}</div>
+                      {stockByLocation.length > 0 && (
+                        <div className="text-xs text-gray-500 mt-1">
+                          {stockByLocation.map((loc, idx) => (
+                            <div key={idx}>{loc.location}: {loc.qty}</div>
+                          ))}
+                        </div>
+                      )}
+                    </td>
                     {/* <td className="px-4 py-4 text-sm text-center text-gray-600">{p.minimumStock}</td> */}
                     <td className="px-4 py-4 text-sm text-center">
                       <span className={`px-2 py-1 rounded text-xs font-semibold ${
-                        currentStock === 0 
-                          ? 'bg-red-100 text-red-700' 
-                          : isLowStock 
-                          ? 'bg-yellow-100 text-yellow-700' 
+                        currentStock === 0
+                          ? 'bg-red-100 text-red-700'
+                          : isLowStock
+                          ? 'bg-yellow-100 text-yellow-700'
                           : 'bg-green-100 text-green-700'
                       }`}>
                         {currentStock === 0 ? 'หมด' : isLowStock ? 'ต่ำ' : 'ปกติ'}
                       </span>
                     </td>
                     <td className="px-4 py-4 text-right space-x-2 whitespace-nowrap">
-                      <button 
+                      <button
                         onClick={() => { setSelectedProduct(p); setShowAddStock(true); }}
                         className="px-3 py-1 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded text-xs font-medium transition-colors"
                       >
                         เพิ่มสต๊อก
                       </button>
-                      <button 
+                      <button
                         onClick={() => { setSelectedProduct(p); setShowReduceStock(true); }}
                         className="px-3 py-1 bg-red-100 hover:bg-red-200 text-red-700 rounded text-xs font-medium transition-colors"
                       >

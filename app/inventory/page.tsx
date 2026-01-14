@@ -1,21 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Package, TrendingUp, AlertTriangle, MapPin, Boxes, BarChart3 } from 'lucide-react';
+import { Package, TrendingUp, AlertTriangle, MapPin, Boxes, BarChart3, Plus, Upload, Settings } from 'lucide-react';
+import Link from 'next/link';
 import { fetchJSON } from '@/lib/api';
-import StockTab from './components/StockTab';
-import LocationsTab from './components/LocationsTab';
-import BestsellersTab from './components/BestsellersTab';
-import ReorderTab from './components/ReorderTab';
-
-const TABS = ['คลังสินค้า', 'สินค้าขายดี', 'การสั่งซื้อใหม่', 'สถานที่ตั้ง'] as const;
-
-const TAB_ICONS: Record<typeof TABS[number], any> = {
-  'คลังสินค้า': Package,
-  'สินค้าขายดี': TrendingUp,
-  'การสั่งซื้อใหม่': AlertTriangle,
-  'สถานที่ตั้ง': MapPin,
-};
 
 interface DashboardStats {
   totalProducts: number;
@@ -24,9 +12,7 @@ interface DashboardStats {
   totalInventoryValue: number;
 }
 
-export default function InventoryPage() {
-  const [tab, setTab] = useState<typeof TABS[number]>('คลังสินค้า');
-  const [products, setProducts] = useState<any[]>([]);
+export default function InventoryDashboard() {
   const [stats, setStats] = useState<DashboardStats>({
     totalProducts: 0,
     totalLocations: 0,
@@ -34,12 +20,13 @@ export default function InventoryPage() {
     totalInventoryValue: 0,
   });
   const [loading, setLoading] = useState(true);
+  const [recentProducts, setRecentProducts] = useState<any[]>([]);
 
   useEffect(() => {
-    loadStats();
+    loadDashboardData();
   }, []);
 
-  async function loadStats() {
+  async function loadDashboardData() {
     setLoading(true);
     try {
       const [productsData, locations] = await Promise.all([
@@ -58,9 +45,12 @@ export default function InventoryPage() {
           }
           totalValue += (currentStock * (p.sellingPrice || 0));
         });
+
+        // Get recent products (last 5)
+        const sortedProducts = productsData.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        setRecentProducts(sortedProducts.slice(0, 5));
       }
 
-      setProducts(productsData || []);
       setStats({
         totalProducts: productsData?.length || 0,
         totalLocations: locations?.length || 0,
@@ -68,40 +58,50 @@ export default function InventoryPage() {
         totalInventoryValue: totalValue,
       });
     } catch (err) {
-      console.error('Failed to load stats:', err);
+      console.error('Failed to load dashboard data:', err);
     } finally {
       setLoading(false);
     }
   }
 
-  async function loadAndDisplayProducts() {
-    setLoading(true);
-    try {
-      const products = await fetchJSON('/api/products');
-      // For displaying in the page, we'll reuse the products fetch
-      return products || [];
-    } catch (err) {
-      console.error('Failed to load products:', err);
-      return [];
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  const getStockAtLocation = (stocklocations: any[]) => {
-    return stocklocations?.reduce((sum: number, sl: any) => sum + (sl.qty || 0), 0) || 0;
-  };
-
-  const StatCard = ({ icon: Icon, title, value, color }: { icon: any; title: string; value: string | number; color: string }) => (
-    <div className={`bg-white rounded-lg border border-gray-200 p-4 ${color}`}>
-      <div className="flex items-center justify-between">
+  const StatCard = ({ icon: Icon, title, value, subtitle, color, link }: {
+    icon: any;
+    title: string;
+    value: string | number;
+    subtitle?: string;
+    color: string;
+    link?: string;
+  }) => (
+    <Link href={link || '#'} className={`block bg-white rounded-lg border border-gray-200 p-6 ${color} hover:shadow-md transition-all`}>
+      <div className="flex items-center justify-between mb-2">
         <div>
           <p className="text-sm text-gray-600 mb-1">{title}</p>
-          <p className="text-2xl font-bold text-gray-900">{value}</p>
+          <p className="text-3xl font-bold text-gray-900">{value}</p>
+          {subtitle && <p className="text-xs text-gray-500 mt-1">{subtitle}</p>}
         </div>
         <Icon size={32} className="text-gray-400" />
       </div>
-    </div>
+    </Link>
+  );
+
+  const QuickActionCard = ({ icon: Icon, title, description, link, color }: {
+    icon: any;
+    title: string;
+    description: string;
+    link: string;
+    color: string;
+  }) => (
+    <Link href={link} className={`block bg-white rounded-lg border border-gray-200 p-6 ${color} hover:shadow-md transition-all`}>
+      <div className="flex items-start space-x-4">
+        <div className={`p-3 rounded-lg ${color.includes('blue') ? 'bg-blue-100' : color.includes('green') ? 'bg-green-100' : 'bg-gray-100'}`}>
+          <Icon size={24} className={color.includes('blue') ? 'text-blue-600' : color.includes('green') ? 'text-green-600' : 'text-gray-600'} />
+        </div>
+        <div>
+          <h3 className="font-semibold text-gray-900 mb-1">{title}</h3>
+          <p className="text-sm text-gray-600">{description}</p>
+        </div>
+      </div>
+    </Link>
   );
 
   return (
@@ -109,116 +109,176 @@ export default function InventoryPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">ระบบจัดการสินค้าคงคลัง</h1>
-          <p className="text-gray-600 text-lg">การติดตามสินค้าคงคลังแบบเรียลไทม์ การวิเคราะห์ข้อมูล และการจัดการคลังสินค้า</p>
+          <div className="flex justify-between items-start">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">Inventory Dashboard</h1>
+              <p className="text-gray-600">Manage your store inventory efficiently</p>
+            </div>
+            <div className="flex items-center space-x-4">
+              <Link
+                href="/"
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
+              >
+                View Store
+              </Link>
+            </div>
+          </div>
         </div>
 
-        {/* Dashboard Statistics */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        {/* Statistics Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <StatCard
             icon={Boxes}
             title="Total Products"
             value={loading ? '...' : stats.totalProducts}
+            subtitle="Active inventory items"
             color="hover:shadow-md transition-shadow"
+            link="/inventory/stock"
           />
           <StatCard
             icon={MapPin}
             title="Locations"
             value={loading ? '...' : stats.totalLocations}
+            subtitle="Storage locations"
             color="hover:shadow-md transition-shadow"
+            link="/inventory/locations"
           />
           <StatCard
             icon={AlertTriangle}
             title="Low Stock Items"
             value={loading ? '...' : stats.lowStockItems}
-            color={stats.lowStockItems > 0 ? 'bg-red-50 border-red-200' : 'hover:shadow-md transition-shadow'}
+            subtitle="Need attention"
+            color={stats.lowStockItems > 0 ? 'bg-yellow-50 border-yellow-200 hover:shadow-md' : 'hover:shadow-md transition-shadow'}
+            link="/inventory/reports"
           />
           <StatCard
             icon={BarChart3}
             title="Inventory Value"
             value={loading ? '...' : `$${(stats.totalInventoryValue / 1000).toFixed(1)}K`}
+            subtitle="Total stock value"
             color="hover:shadow-md transition-shadow"
+            link="/inventory/reports"
           />
         </div>
 
-        {/* All Products Table */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">สินค้าทั้งหมด</h2>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">SKU</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">ชื่อผลิตภัณฑ์</th>
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">บาร์โค้ด</th>
-                  <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700">ราคาขาย</th>
-                  <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700">สต๊อกปัจจุบัน</th>
-                  <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700">สต๊อกขั้นต่ำ</th>
-                  <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700">สถานะ</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {loading ? (
-                  <tr><td colSpan={7} className="px-4 py-8 text-center text-gray-500">กำลังโหลดสินค้า...</td></tr>
-                ) : products.length === 0 ? (
-                  <tr><td colSpan={7} className="px-4 py-8 text-center text-gray-500">ไม่พบสินค้า</td></tr>
-                ) : (
-                  products.map(p => {
-                    const currentStock = getStockAtLocation(p.stocklocation);
-                    const isLowStock = currentStock < p.minimumStock;
-                    return (
-                      <tr key={p.id} className={`hover:bg-gray-50 transition-colors ${isLowStock ? 'bg-red-50' : ''}`}>
-                        <td className="px-4 py-3 text-sm font-semibold text-gray-900">{p.sku}</td>
-                        <td className="px-4 py-3 text-sm text-gray-700">{p.name}</td>
-                        <td className="px-4 py-3 text-sm text-gray-600">{p.barcode || '-'}</td>
-                        <td className="px-4 py-3 text-sm text-center text-gray-900 font-medium">${p.sellingPrice || 0}</td>
-                        <td className="px-4 py-3 text-sm text-center text-gray-600 font-medium">{currentStock}</td>
-                        <td className="px-4 py-3 text-sm text-center text-gray-600">{p.minimumStock}</td>
-                        <td className="px-4 py-3 text-sm text-center">
-                          <span className={`px-2 py-1 rounded text-xs font-semibold ${
-                            currentStock === 0 
-                              ? 'bg-red-100 text-red-700' 
-                              : isLowStock 
-                              ? 'bg-yellow-100 text-yellow-700'
-                              : 'bg-green-100 text-green-700'
-                          }`}>
-                            {currentStock === 0 ? 'สินค้าหมด' : isLowStock ? 'สินค้าเหลือน้อย' : 'มีสินค้าพร้อมส่ง'}
-                          </span>
-                        </td>
-                      </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
-          </div>
+        {/* Quick Actions */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          <QuickActionCard
+            icon={Package}
+            title="Manage Stock"
+            description="Add, edit, and track product inventory"
+            link="/inventory/stock"
+            color="hover:shadow-md"
+          />
+          <QuickActionCard
+            icon={MapPin}
+            title="Location Management"
+            description="Configure storage locations and zones"
+            link="/inventory/locations"
+            color="hover:shadow-md"
+          />
+          <QuickActionCard
+            icon={TrendingUp}
+            title="Reports & Analytics"
+            description="View insights and reorder recommendations"
+            link="/inventory/reports"
+            color="hover:shadow-md"
+          />
         </div>
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-          <div className="flex flex-wrap border-b border-gray-200">
-            {TABS.map(t => {
-              const Icon = TAB_ICONS[t];
-              return (
-                <button
-                  key={t}
-                  onClick={() => setTab(t)}
-                  className={`flex-1 px-6 py-4 font-medium border-b-2 transition-colors flex items-center justify-center gap-2 ${
-                    t === tab
-                      ? 'bg-blue-50 border-b-blue-500 text-blue-700'
-                      : 'bg-white border-b-transparent text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  <Icon size={18} />
-                  {t}
-                </button>
-              );
-            })}
+
+        {/* Recent Activity */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Recent Products */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+            <div className="border-b border-gray-200 bg-gray-50 px-6 py-4">
+              <h2 className="text-lg font-semibold text-gray-900">Recent Products</h2>
+            </div>
+            <div className="divide-y divide-gray-200">
+              {loading ? (
+                <div className="flex justify-center items-center py-8">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                </div>
+              ) : recentProducts.length === 0 ? (
+                <div className="text-center py-8 px-6">
+                  <Package className="mx-auto h-8 w-8 text-gray-400 mb-2" />
+                  <p className="text-gray-600">No products yet</p>
+                  <Link
+                    href="/inventory/stock"
+                    className="text-blue-600 hover:text-blue-700 text-sm font-medium mt-2 inline-block"
+                  >
+                    Add your first product →
+                  </Link>
+                </div>
+              ) : (
+                recentProducts.map(product => (
+                  <div key={product.id} className="px-6 py-4 hover:bg-gray-50">
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <h3 className="font-medium text-gray-900">{product.name}</h3>
+                        <p className="text-sm text-gray-600">SKU: {product.sku}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-medium text-gray-900">
+                          ${product.sellingPrice || 0}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {product.stocklocation?.reduce((sum: number, sl: any) => sum + sl.qty, 0) || 0} in stock
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+            <div className="border-t border-gray-200 bg-gray-50 px-6 py-3">
+              <Link
+                href="/inventory/stock"
+                className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+              >
+                View all products →
+              </Link>
+            </div>
           </div>
 
-          <div className="p-6">
-            {tab === 'คลังสินค้า' && <StockTab />}
-            {tab === 'สินค้าขายดี' && <BestsellersTab />}
-            {tab === 'การสั่งซื้อใหม่' && <ReorderTab />}
-            {tab === 'สถานที่ตั้ง' && <LocationsTab />}
+          {/* Quick Stats */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+            <div className="border-b border-gray-200 bg-gray-50 px-6 py-4">
+              <h2 className="text-lg font-semibold text-gray-900">Quick Stats</h2>
+            </div>
+            <div className="p-6 space-y-4">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-600">Average stock per product</span>
+                <span className="font-medium text-gray-900">
+                  {stats.totalProducts > 0
+                    ? Math.round(stats.totalInventoryValue / stats.totalProducts / 10) * 10
+                    : 0} units
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-600">Stock efficiency</span>
+                <span className="font-medium text-green-600">
+                  {stats.totalProducts > 0
+                    ? Math.round((1 - stats.lowStockItems / stats.totalProducts) * 100)
+                    : 0}%
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-600">Locations utilization</span>
+                <span className="font-medium text-blue-600">
+                  {stats.totalLocations > 0
+                    ? Math.round((stats.totalProducts / stats.totalLocations) * 10) / 10
+                    : 0} products/location
+                </span>
+              </div>
+              <div className="border-t border-gray-200 pt-4 mt-4">
+                <Link
+                  href="/inventory/reports"
+                  className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                >
+                  View detailed analytics →
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
       </div>
