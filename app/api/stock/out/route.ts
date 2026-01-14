@@ -9,17 +9,19 @@ export async function POST(req: Request) {
     if (!productId || !locationName || qty === undefined)
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
 
-    // Find location
-    const location = await prisma.location.findUnique({
+    // Find or create location
+    let location = await prisma.location.findUnique({
       where: { name: locationName },
     });
 
     if (!location) {
-      return NextResponse.json({ error: 'Location not found' }, { status: 404 });
+      location = await prisma.location.create({
+        data: { name: locationName },
+      });
     }
 
     // Get stock location
-    const stockLocation = await prisma.stockLocation.findUnique({
+    let stockLocation = await prisma.stocklocation.findUnique({
       where: {
         productId_locationId: {
           productId: Number(productId),
@@ -28,17 +30,26 @@ export async function POST(req: Request) {
       },
     });
 
+    // If stock location doesn't exist, create it with 0 qty
     if (!stockLocation) {
-      return NextResponse.json({ error: 'Product not found in this location' }, { status: 404 });
+      stockLocation = await prisma.stocklocation.create({
+        data: {
+          productId: Number(productId),
+          locationId: location.id,
+          qty: 0,
+        },
+      });
     }
 
     const newQty = stockLocation.qty - Number(qty);
     if (newQty < 0) {
-      return NextResponse.json({ error: 'Insufficient stock' }, { status: 400 });
+      return NextResponse.json({ 
+        error: `Insufficient stock in ${locationName}. Available: ${stockLocation.qty}, Requested: ${qty}` 
+      }, { status: 400 });
     }
 
     // Update stock
-    const updated = await prisma.stockLocation.update({
+    const updated = await prisma.stocklocation.update({
       where: {
         productId_locationId: {
           productId: Number(productId),
@@ -51,7 +62,7 @@ export async function POST(req: Request) {
     });
 
     // Record stock movement
-    await prisma.stockMovement.create({
+    await prisma.stockmovement.create({
       data: {
         productId: Number(productId),
         type: 'OUT',

@@ -27,73 +27,105 @@ export async function POST(req: Request) {
     for (let i = 0; i < rows.length; i++) {
       const row = rows[i];
       const skuRaw = getCell(row, 'sku');
-      const qtyRaw = getCell(row, 'qty') ?? getCell(row, 'quantity');
+      const nameRaw = getCell(row, 'name') ?? getCell(row, 'product name') ?? getCell(row, 'productName');
+      const priceRaw = getCell(row, 'price') ?? getCell(row, 'selling price') ?? getCell(row, 'sellingPrice');
       const locationRaw = getCell(row, 'location') ?? getCell(row, 'locationName');
-      const nameRaw = getCell(row, 'name');
       const barcodeRaw = getCell(row, 'barcode');
-      const minStockRaw = getCell(row, 'minimumStock') ?? getCell(row, 'minimum_stock');
+      const minStockRaw = getCell(row, 'minimumStock') ?? getCell(row, 'minimum_stock') ?? getCell(row, 'minimum stock') ?? getCell(row, 'min stock');
+      const qtyRaw = getCell(row, 'qty') ?? getCell(row, 'quantity');
 
       const sku = skuRaw ? String(skuRaw).trim() : '';
-      const qty = qtyRaw !== undefined ? Math.floor(Number(qtyRaw)) : NaN;
+      const name = nameRaw ? String(nameRaw).trim() : '';
       const locationName = locationRaw ? String(locationRaw).trim() : 'Main';
+      const qty = qtyRaw !== undefined ? Math.floor(Number(qtyRaw)) : 0;
+      const sellingPrice = priceRaw ? Number(priceRaw) : 0;
+      const minimumStock = minStockRaw !== undefined ? Math.floor(Number(minStockRaw)) : 0;
 
       if (!sku) {
         results.push({ row: i + 1, success: false, message: 'Missing SKU' });
         continue;
       }
 
-      if (!Number.isFinite(qty) || qty <= 0) {
-        results.push({ row: i + 1, sku, success: false, message: 'Invalid or missing qty (>0 required)' });
+      if (!name) {
+        results.push({ row: i + 1, sku, success: false, message: 'Missing product name' });
         continue;
       }
 
       try {
-        // Process each row in its own transaction so one bad row doesn't stop others
-        await prisma.$transaction(async (tx) => {
-          const upserted = await (tx as any).product.upsert({
-            where: { sku: String(sku) },
-            create: {
-              sku: String(sku),
-              name: nameRaw ? String(nameRaw) : String(sku),
-              barcode: barcodeRaw ? String(barcodeRaw) : undefined,
-              minimumStock: minStockRaw ? Number(minStockRaw) || 0 : 0,
+        // Upsert product
+        const product = await prisma.product.upsert({
+          where: { sku },
+          create: {
+            sku,
+            name,
+            barcode: barcodeRaw ? String(barcodeRaw) : undefined,
+            sellingPrice,
+            minimumStock,
+          },
+          update: {
+            name,
+            barcode: barcodeRaw ? String(barcodeRaw) : undefined,
+            sellingPrice,
+            minimumStock,
+          },
+        });
+
+        // Upsert location
+        const location = await prisma.location.upsert({
+          where: { name: locationName },
+          create: { name: locationName },
+          update: {},
+        });
+
+        // Upsert stock location
+        await prisma.stocklocation.upsert({
+          where: {
+            productId_locationId: {
+              productId: product.id,
+              locationId: location.id,
             },
-            update: {
-              name: nameRaw ? String(nameRaw) : undefined,
-              barcode: barcodeRaw ? String(barcodeRaw) : undefined,
-              minimumStock: minStockRaw ? Number(minStockRaw) || 0 : undefined,
+          },
+          create: {
+            productId: product.id,
+            locationId: location.id,
+            qty,
+          },
+          update: {
+            qty: { increment: qty },
+          },
+        });
+
+        // Record stock movement
+        if (qty > 0) {
+          await prisma.stockmovement.create({
+            data: {
+              productId: product.id,
+              type: 'IN',
+              qty,
+              refType: 'IMPORT',
             },
           });
-
-          // Ensure location exists
-          let location = await (tx as any).location.findUnique({ where: { name: locationName } });
-          if (!location) {
-            location = await (tx as any).location.create({ data: { name: locationName } });
-          }
-
-          // Update stock location
-          const existing = await (tx as any).stockLocation.findFirst({ where: { productId: upserted.id, locationId: location.id } });
-          if (existing) {
-            await (tx as any).stockLocation.update({ where: { id: existing.id }, data: { qty: existing.qty + qty } });
-          } else {
-            await (tx as any).stockLocation.create({ data: { productId: upserted.id, locationId: location.id, qty } });
-          }
-
-          // Create stock movement
-          await (tx as any).stockMovement.create({ data: { productId: upserted.id, type: 'IN', qty, refType: 'IMPORT' } });
-        });
+        }
 
         results.push({ row: i + 1, sku, success: true });
       } catch (err: any) {
-        console.error('Row import error', i + 1, err);
-        results.push({ row: i + 1, sku, success: false, message: String(err?.message ?? err) });
+        console.error(`Row ${i + 1} error:`, err);
+        results.push({ 
+          row: i + 1, 
+          sku, 
+          success: false, 
+          message: err?.message || String(err) 
+        });
       }
     }
 
     const imported = results.filter(r => r.success).length;
     return NextResponse.json({ success: true, total: rows.length, imported, results });
   } catch (err: any) {
-    console.error(err);
-    return NextResponse.json({ error: 'Failed to import file', details: String(err?.message ?? err) }, { status: 500 });
+    console.error('Import error:', err);
+    return NextResponse.json({ 
+      error: 'Failed to import file', 
+      details: err?.message || String(err) 
+    }, { status: 500 });
   }
 }
