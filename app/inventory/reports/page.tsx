@@ -197,7 +197,7 @@ export default function ReportsPage() {
                 className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
               >
                 <ArrowLeft size={20} />
-                <span>Back to Dashboard</span>
+                <span>กลับไปยังแดชบอร์ด</span>
               </Link>
             </div>
             <div className="flex items-center space-x-4">
@@ -207,19 +207,19 @@ export default function ReportsPage() {
                 className="flex items-center gap-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 disabled:bg-gray-400 text-white rounded-lg font-medium transition-colors"
               >
                 <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
-                Refresh
+                รีเฟรชข้อมูล
               </button>
               <Link
                 href="/"
                 className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
               >
-                View Store
+                ดูร้านค้า
               </Link>
             </div>
           </div>
           <div className="mt-4">
-            <h1 className="text-3xl font-bold text-gray-900">Reports & Analytics</h1>
-            <p className="text-gray-600 mt-1">Comprehensive inventory reports and business insights</p>
+            <h1 className="text-3xl font-bold text-gray-900">รายงานและวิเคราะห์</h1>
+            <p className="text-gray-600 mt-1">รายงานสต็อกและการวิเคราะห์ธุรกิจที่ครอบคลุม</p>
           </div>
         </div>
 
@@ -228,14 +228,14 @@ export default function ReportsPage() {
           <div className="flex flex-wrap items-center gap-4">
             <div className="flex items-center space-x-2">
               <Calendar className="h-5 w-5 text-gray-600" />
-              <span className="font-medium text-gray-900">Report Period:</span>
+              <span className="font-medium text-gray-900">ช่วงเวลารายงาน:</span>
             </div>
             <div className="flex space-x-2">
               {[
-                { key: 'today', label: 'Today' },
-                { key: 'week', label: 'This Week' },
-                { key: 'month', label: 'This Month' },
-                { key: 'custom', label: 'Custom Range' }
+                { key: 'today', label: 'วันนี้' },
+                { key: 'week', label: 'สัปดาห์นี้' },
+                { key: 'month', label: 'เดือนนี้' },
+                { key: 'custom', label: 'ช่วงเวลาที่กำหนด' }
               ].map(({ key, label }) => (
                 <button
                   key={key}
@@ -253,7 +253,7 @@ export default function ReportsPage() {
             {timeRange === 'custom' && (
               <div className="flex items-center space-x-4">
                 <div>
-                  <label className="block text-xs text-gray-600 mb-1">Start Date</label>
+                  <label className="block text-xs text-gray-600 mb-1">เริ่มวันที่</label>
                   <input
                     type="date"
                     value={customStartDate}
@@ -262,7 +262,7 @@ export default function ReportsPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-gray-600 mb-1">End Date</label>
+                  <label className="block text-xs text-gray-600 mb-1">สิ้นสุดวันที่</label>
                   <input
                     type="date"
                     value={customEndDate}
@@ -280,9 +280,9 @@ export default function ReportsPage() {
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Items Received</p>
+                <p className="text-sm text-gray-600">รายการที่ได้รับ</p>
                 <p className="text-2xl font-bold text-blue-600">{totalReceived}</p>
-                <p className="text-xs text-gray-500 mt-1">{itemsReceived.length} transactions</p>
+                <p className="text-xs text-gray-500 mt-1">{itemsReceived.length} รายการ</p>
               </div>
               <Package className="h-8 w-8 text-blue-600" />
             </div>
@@ -290,9 +290,9 @@ export default function ReportsPage() {
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Items Sold</p>
+                <p className="text-sm text-gray-600">รายการที่ขาย</p>
                 <p className="text-2xl font-bold text-green-600">{totalSold}</p>
-                <p className="text-xs text-gray-500 mt-1">{itemsSold.length} sales</p>
+                <p className="text-xs text-gray-500 mt-1">{itemsSold.length} รายการขาย</p>
               </div>
               <ShoppingCart className="h-8 w-8 text-green-600" />
             </div>
@@ -300,9 +300,9 @@ export default function ReportsPage() {
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Sales Revenue</p>
+                <p className="text-sm text-gray-600">รายได้จากการขาย</p>
                 <p className="text-2xl font-bold text-emerald-600">{formatCurrency(salesRevenue)}</p>
-                <p className="text-xs text-gray-500 mt-1">Total sales value</p>
+                <p className="text-xs text-gray-500 mt-1">มูลค่าการขายรวม</p>
               </div>
               <DollarSign className="h-8 w-8 text-emerald-600" />
             </div>
@@ -310,11 +310,11 @@ export default function ReportsPage() {
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Avg. Sale Price</p>
+                <p className="text-sm text-gray-600">ราคาขายเฉลี่ย</p>
                 <p className="text-2xl font-bold text-purple-600">
                   {itemsSold.length > 0 ? formatCurrency(salesRevenue / totalSold) : '$0.00'}
                 </p>
-                <p className="text-xs text-gray-500 mt-1">Per unit sold</p>
+                <p className="text-xs text-gray-500 mt-1">ต่อหน่วยที่ขาย</p>
               </div>
               <Activity className="h-8 w-8 text-purple-600" />
             </div>
@@ -329,18 +329,18 @@ export default function ReportsPage() {
               <div className="border-b border-gray-200 bg-blue-50 px-6 py-4">
                 <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
                   <Activity className="h-5 w-5 text-blue-600" />
-                  Stock Movement Summary
+                  สรุปการเคลื่อนไหวของสินค้าคงคลัง
                 </h2>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead className="bg-gray-50 border-b border-gray-200">
                     <tr>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Date</th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Product</th>
-                      <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700">Type</th>
-                      <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700">Quantity</th>
-                      <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700">Reference</th>
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">วันที่</th>
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">สินค้า</th>
+                      <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700">ประเภท</th>
+                      <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700">จำนวน</th>
+                      <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700">อ้างอิง</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
@@ -353,7 +353,7 @@ export default function ReportsPage() {
                     ) : movements.length === 0 ? (
                       <tr>
                         <td colSpan={5} className="px-6 py-8 text-center text-gray-600">
-                          No stock movements found for this period
+                          ไม่พบความเคลื่อนไหวของสินค้าคงคลังในช่วงเวลานี้
                         </td>
                       </tr>
                     ) : (
@@ -418,18 +418,18 @@ export default function ReportsPage() {
               <div className="border-b border-gray-200 bg-purple-50 px-6 py-4">
                 <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
                   <BarChart3 className="h-5 w-5 text-purple-600" />
-                  Product Performance Summary
+                  สรุปประสิทธิภาพผลิตภัณฑ์
                 </h2>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead className="bg-gray-50 border-b border-gray-200">
                     <tr>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Product</th>
-                      <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700">Sold</th>
-                      <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700">Received</th>
-                      <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700">Revenue</th>
-                      <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700">Turnover</th>
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">สินค้า</th>
+                      <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700">ขายแล้ว</th>
+                      <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700">รับเข้าแล้ว</th>
+                      <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700">รายได้</th>
+                      <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700">อัตราการหมุนเวียน</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
@@ -442,7 +442,7 @@ export default function ReportsPage() {
                     ) : productPerformance.length === 0 ? (
                       <tr>
                         <td colSpan={5} className="px-6 py-8 text-center text-gray-600">
-                          No product data available
+                          ไม่มีข้อมูลสินค้า
                         </td>
                       </tr>
                     ) : (
@@ -501,7 +501,7 @@ export default function ReportsPage() {
               <div className="border-b border-gray-200 bg-yellow-50 px-6 py-4">
                 <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
                   <AlertTriangle className="h-5 w-5 text-yellow-600" />
-                  Low Stock Alerts
+                  แจ้งเตือนสินค้าเหลือน้อย
                 </h3>
               </div>
               <div className="max-h-80 overflow-y-auto">
@@ -512,7 +512,7 @@ export default function ReportsPage() {
                 ) : lowStockProducts.length === 0 ? (
                   <div className="text-center py-6 px-4">
                     <AlertTriangle className="mx-auto h-6 w-6 text-gray-400 mb-2" />
-                    <p className="text-sm text-gray-600">All products sufficiently stocked</p>
+                    <p className="text-sm text-gray-600">สินค้าทั้งหมดมีสต๊อกเพียงพอ</p>
                   </div>
                 ) : (
                   <div className="divide-y divide-gray-200">
@@ -537,7 +537,7 @@ export default function ReportsPage() {
                     {lowStockProducts.length > 5 && (
                       <div className="px-4 py-3 bg-gray-50 text-center">
                         <Link href="#low-stock" className="text-sm text-blue-600 hover:text-blue-700">
-                          +{lowStockProducts.length - 5} more...
+                          +{lowStockProducts.length - 5} เพิ่มเติม...
                         </Link>
                       </div>
                     )}
@@ -551,7 +551,7 @@ export default function ReportsPage() {
               <div className="border-b border-gray-200 bg-red-50 px-6 py-4">
                 <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
                   <ShoppingCart className="h-5 w-5 text-red-600" />
-                  Out of Stock
+                  สินค้าหมดสต็อก
                 </h3>
               </div>
               <div className="max-h-80 overflow-y-auto">
@@ -562,7 +562,7 @@ export default function ReportsPage() {
                 ) : outOfStockProducts.length === 0 ? (
                   <div className="text-center py-6 px-4">
                     <ShoppingCart className="mx-auto h-6 w-6 text-gray-400 mb-2" />
-                    <p className="text-sm text-gray-600">No products out of stock</p>
+                    <p className="text-sm text-gray-600">ไม่มีสินค้าหมดสต็อก</p>
                   </div>
                 ) : (
                   <div className="divide-y divide-gray-200">
@@ -574,7 +574,7 @@ export default function ReportsPage() {
                             <p className="text-xs text-gray-600">{product.sku}</p>
                           </div>
                           <span className="px-2 py-1 bg-red-100 text-red-700 text-xs font-medium rounded ml-2">
-                            OOS
+                            สินค้าหมด
                           </span>
                         </div>
                       </div>
@@ -589,7 +589,7 @@ export default function ReportsPage() {
               <div className="border-b border-gray-200 bg-green-50 px-6 py-4">
                 <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
                   <TrendingUp className="h-5 w-5 text-green-600" />
-                  Top Sellers
+                  สินค้าขายดี
                 </h3>
               </div>
               <div className="max-h-80 overflow-y-auto">
@@ -600,7 +600,7 @@ export default function ReportsPage() {
                 ) : productPerformance.filter(p => p.sold > 0).length === 0 ? (
                   <div className="text-center py-6 px-4">
                     <TrendingUp className="mx-auto h-6 w-6 text-gray-400 mb-2" />
-                    <p className="text-sm text-gray-600">No sales data yet</p>
+                    <p className="text-sm text-gray-600">ยังไม่มีข้อมูลการขาย</p>
                   </div>
                 ) : (
                   <div className="divide-y divide-gray-200">
@@ -612,7 +612,7 @@ export default function ReportsPage() {
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium text-gray-900 truncate">{product.name}</p>
-                            <p className="text-xs text-gray-600">{product.sold} sold • {formatCurrency(product.revenue)}</p>
+                            <p className="text-xs text-gray-600">{product.sold} ขายแล้ว • {formatCurrency(product.revenue)}</p>
                           </div>
                         </div>
                       </div>
