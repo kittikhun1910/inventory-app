@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { MapPin, Package, Search, ShoppingCart, Filter, Grid, List, AlertTriangle, CheckCircle, Store, Warehouse, Eye, EyeOff } from 'lucide-react';
+import { MapPin, Package, Search, ShoppingCart, Filter, Grid, List, AlertTriangle, CheckCircle, Store, Warehouse, Eye, Menu, X } from 'lucide-react';
 import Link from 'next/link';
 import { fetchJSON } from '@/lib/api';
 
@@ -24,12 +24,12 @@ interface Product {
 
 export default function StorePage() {
   const [products, setProducts] = useState<Product[]>([]);
-  const [locations, setLocations] = useState<Array<{id: number, name: string}>>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [filterStatus, setFilterStatus] = useState<'all' | 'in-stock' | 'low-stock' | 'out-of-stock'>('all');
-  const [filterLocation, setFilterLocation] = useState<string>('all');
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
 
   useEffect(() => {
     loadProducts();
@@ -71,212 +71,264 @@ export default function StorePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div className="flex items-center space-x-4">
-              <ShoppingCart className="h-8 w-8 text-blue-600" />
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">สต๊อกสินค้า</h1>
-                <p className="text-sm text-gray-600">ค้นหาสินค้าและสถานที่จัดเก็บ</p>
+    <div className="min-h-screen bg-slate-50">
+      {/* Mobile Header */}
+      <header className="bg-white shadow-sm border-b border-slate-200 sticky top-0 z-40">
+        <div className="px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16 lg:h-20">
+            {/* Logo and Title */}
+            <div className="flex items-center space-x-2 sm:space-x-3">
+              <ShoppingCart className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600 flex-shrink-0" />
+              <div className="min-w-0">
+                <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-slate-900 truncate">สต๊อกสินค้า</h1>
+                <p className="text-xs sm:text-sm text-slate-600 hidden sm:block">ค้นหาสินค้าและสถานที่จัดเก็บ</p>
               </div>
             </div>
-            <div className="flex items-center space-x-4">
-              <a
+            
+            {/* Desktop Actions */}
+            <div className="hidden lg:flex items-center space-x-4">
+              <Link
                 href="/inventory"
-                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors"
+                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium transition-colors"
               >
                 แผงควบคุมผู้ดูแลระบบ
-              </a>
+              </Link>
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
                 <input
                   type="text"
-                  placeholder="Search products..."
+                  placeholder="ค้นหาสินค้า..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="pl-10 pr-4 py-2 w-64 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
             </div>
+
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setShowMobileMenu(!showMobileMenu)}
+              className="lg:hidden p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
+            >
+              {showMobileMenu ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </button>
           </div>
+
+          {/* Mobile Search - Always visible on mobile */}
+          <div className="lg:hidden pb-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <input
+                type="text"
+                placeholder="ค้นหาสินค้า..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+          </div>
+
+          {/* Mobile Menu Dropdown */}
+          {showMobileMenu && (
+            <div className="lg:hidden pb-4 animate-slide-down">
+              <Link
+                href="/inventory"
+                className="block w-full px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium transition-colors text-center"
+                onClick={() => setShowMobileMenu(false)}
+              >
+                แผงควบคุมผู้ดูแลระบบ
+              </Link>
+            </div>
+          )}
         </div>
       </header>
 
       {/* Filters and Controls */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2">
-              <Filter className="h-4 w-4 text-gray-500" />
-              <span className="text-sm font-medium text-gray-700">Filter:</span>
-            </div>
-            <div className="flex space-x-2">
-              {[
-                { key: 'all', label: 'ทั้งหมด', icon: null },
-                { key: 'in-stock', label: 'มีสินค้าพร้อมส่ง', icon: CheckCircle },
-                { key: 'low-stock', label: 'สินค้าเหลือน้อย', icon: AlertTriangle },
-                { key: 'out-of-stock', label: 'สินค้าหมด', icon: Package }
-              ].map(({ key, label, icon: Icon }) => (
-                <button
-                  key={key}
-                  onClick={() => setFilterStatus(key as any)}
-                  className={`px-3 py-1 text-xs font-medium rounded-full transition-colors ${
-                    filterStatus === key
-                      ? 'bg-blue-100 text-blue-700'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  }`}
-                >
-                  {Icon && <Icon className="h-3 w-3 inline mr-1" />}
-                  {label}
-                </button>
-              ))}
+      <div className="sticky top-16 lg:top-20 z-30 bg-white border-b border-slate-200 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 lg:py-4">
+          {/* Mobile Filter Toggle */}
+          <div className="lg:hidden mb-3">
+            <button
+              onClick={() => setShowMobileFilters(!showMobileFilters)}
+              className="w-full flex items-center justify-between px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium transition-colors"
+            >
+              <div className="flex items-center space-x-2">
+                <Filter className="h-4 w-4" />
+                <span>ตัวกรอง ({filterStatus === 'all' ? 'ทั้งหมด' : filterStatus === 'in-stock' ? 'มีสินค้า' : filterStatus === 'low-stock' ? 'เหลือน้อย' : 'หมดสต็อก'})</span>
+              </div>
+              <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">{filteredProducts.length}</span>
+            </button>
+          </div>
+
+          {/* Desktop Filters */}
+          <div className={`${showMobileFilters ? 'block' : 'hidden'} lg:block space-y-3 lg:space-y-0`}>
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                <div className="hidden lg:flex items-center space-x-2">
+                  <Filter className="h-4 w-4 text-slate-500" />
+                  <span className="text-sm font-medium text-slate-700">ตัวกรอง:</span>
+                </div>
+                <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2">
+                  {[
+                    { key: 'all', label: 'ทั้งหมด', icon: null },
+                    { key: 'in-stock', label: 'มีสินค้า', icon: CheckCircle },
+                    { key: 'low-stock', label: 'เหลือน้อย', icon: AlertTriangle },
+                    { key: 'out-of-stock', label: 'หมดสต็อก', icon: Package }
+                  ].map(({ key, label, icon: Icon }) => (
+                    <button
+                      key={key}
+                      onClick={() => {
+                        setFilterStatus(key as any);
+                        setShowMobileFilters(false);
+                      }}
+                      className={`px-3 py-2 text-xs sm:text-sm font-medium rounded-lg transition-colors flex items-center justify-center ${
+                        filterStatus === key
+                          ? 'bg-blue-600 text-white shadow-sm'
+                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                      }`}
+                    >
+                      {Icon && <Icon className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />}
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              
+              {/* View Mode Toggle */}
+              <div className="flex items-center justify-between lg:justify-end">
+                <span className="text-sm text-slate-600">
+                  {filteredProducts.length} จาก {products.length} สินค้า
+                </span>
+                <div className="flex border border-slate-300 rounded-lg overflow-hidden ml-3">
+                  <button
+                    onClick={() => setViewMode('grid')}
+                    className={`p-2 transition-colors ${viewMode === 'grid' ? 'bg-blue-600 text-white' : 'text-slate-600 hover:bg-slate-100'}`}
+                  >
+                    <Grid className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => setViewMode('list')}
+                    className={`p-2 transition-colors ${viewMode === 'list' ? 'bg-blue-600 text-white' : 'text-slate-600 hover:bg-slate-100'}`}
+                  >
+                    <List className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
-          <div className="flex items-center space-x-2">
-            <span className="text-sm text-gray-600">เเสดง:</span>
-            <div className="flex border border-gray-300 rounded-lg">
-              <button
-                onClick={() => setViewMode('grid')}
-                className={`p-2 ${viewMode === 'grid' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'}`}
-              >
-                <Grid className="h-4 w-4" />
-              </button>
-              <button
-                onClick={() => setViewMode('list')}
-                className={`p-2 ${viewMode === 'list' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'}`}
-              >
-                <List className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-        </div>
-        <div className="mt-3 text-sm text-gray-600">
-          แสดง {filteredProducts.length} จาก {products.length} สินค้า
         </div>
       </div>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
         {loading ? (
-          <div className="flex justify-center items-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <div className="flex justify-center items-center py-20">
+            <div className="animate-spin rounded-full h-12 w-12 border-4 border-slate-200 border-t-blue-600"></div>
           </div>
         ) : viewMode === 'grid' ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6">
             {filteredProducts.map((product) => {
               const totalStock = getTotalStock(product.stocklocation);
               return (
                 <div
                   key={product.id}
-                  className="group bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-xl hover:border-gray-300 transition-all duration-300 transform hover:-translate-y-1"
+                  className="group bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-lg hover:border-slate-300 transition-all duration-300"
                 >
                   {/* Status Banner */}
-                  <div className={`h-2 ${
+                  <div className={`h-1.5 ${
                     totalStock === 0 ? 'bg-red-500' :
                     totalStock < product.minimumStock ? 'bg-yellow-500' : 'bg-green-500'
                   }`} />
 
-                  <div className="p-6">
+                  <div className="p-4 lg:p-5">
                     {/* Header */}
-                    <div className="flex justify-between items-start mb-4">
-                      <div className="flex-1">
-                        <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
-                          {product.name}
-                        </h3>
-                        <div className="flex items-center space-x-3">
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                            SKU: {product.sku}
+                    <div className="mb-3">
+                      <h3 className="text-base lg:text-lg font-bold text-slate-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                        {product.name}
+                      </h3>
+                      <div className="flex flex-wrap gap-2">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800">
+                          {product.sku}
+                        </span>
+                        {product.barcode && (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            {product.barcode}
                           </span>
-                          {product.barcode && (
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                              {product.barcode}
-                            </span>
-                          )}
-                        </div>
+                        )}
                       </div>
-                      <div className="text-right ml-4">
-                        <div className="text-2xl font-bold text-green-600 mb-1">
+                      <div className="mt-2 flex items-baseline">
+                        <div className="text-xl lg:text-2xl font-bold text-green-600">
                           ${product.sellingPrice}
                         </div>
-                        <div className="text-xs text-gray-500">ต่อหน่วย</div>
+                        <div className="text-xs text-slate-500 ml-1">/ หน่วย</div>
                       </div>
                     </div>
 
                     {/* Stock Overview */}
-                    <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center space-x-2">
-                          <Package className="h-5 w-5 text-gray-600" />
-                          <span className="font-medium text-gray-900">ภาพรวมสินค้าคงคลัง</span>
+                    <div className="bg-slate-50 rounded-lg p-3 mb-3">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center space-x-1.5">
+                          <Package className="h-4 w-4 text-slate-600" />
+                          <span className="text-xs font-medium text-slate-900">สต็อก</span>
                         </div>
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
                           totalStock === 0 ? 'bg-red-100 text-red-800' :
                           totalStock < product.minimumStock ? 'bg-yellow-100 text-yellow-800' :
                           'bg-green-100 text-green-800'
                         }`}>
-                          {totalStock === 0 ? 'สินค้าหมดสต็อก' :
-                           totalStock < product.minimumStock ? 'สินค้าคงคลังต่ำ' : 'มีสินค้า'}
+                          {totalStock === 0 ? 'หมด' :
+                           totalStock < product.minimumStock ? 'เหลือน้อย' : 'มีสินค้า'}
                         </span>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-4 text-center">
-                        <div className="bg-white rounded-lg p-3 border">
-                          <div className={`text-2xl font-bold ${
+                      <div className="grid grid-cols-2 gap-2 text-center">
+                        <div className="bg-white rounded-lg p-2 border border-slate-200">
+                          <div className={`text-lg lg:text-xl font-bold ${
                             totalStock === 0 ? 'text-red-600' :
                             totalStock < product.minimumStock ? 'text-yellow-600' : 'text-green-600'
                           }`}>
                             {totalStock}
                           </div>
-                          <div className="text-xs text-gray-600">รวมหน่วย</div>
+                          <div className="text-xs text-slate-600">ทั้งหมด</div>
                         </div>
-                        <div className="bg-white rounded-lg p-3 border">
-                          <div className="text-2xl font-bold text-blue-600">
+                        <div className="bg-white rounded-lg p-2 border border-slate-200">
+                          <div className="text-lg lg:text-xl font-bold text-blue-600">
                             {product.minimumStock}
                           </div>
-                          <div className="text-xs text-gray-600">ขั้นต่ำที่ต้องการ</div>
+                          <div className="text-xs text-slate-600">ขั้นต่ำ</div>
                         </div>
                       </div>
                     </div>
 
                     {/* Locations */}
-                    <div className="space-y-3">
-                      <div className="flex items-center space-x-2">
-                        <Warehouse className="h-5 w-5 text-gray-600" />
-                        <span className="font-medium text-gray-900">ที่ตั้งคลังสินค้า</span>
-                        <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
-                          {product.stocklocation.length} ที่ตั้ง{product.stocklocation.length !== 1 ? 's' : ''}
+                    <div className="space-y-2">
+                      <div className="flex items-center space-x-1.5">
+                        <Warehouse className="h-4 w-4 text-slate-600" />
+                        <span className="text-xs font-medium text-slate-900">
+                          {product.stocklocation.length} สถานที่
                         </span>
                       </div>
 
                       {product.stocklocation.length === 0 ? (
-                        <div className="bg-gray-50 rounded-lg p-4 text-center">
-                          <MapPin className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                          <p className="text-sm text-gray-600">ไม่มีที่ตั้งคลังสินค้าที่กำหนดไว้</p>
+                        <div className="bg-slate-50 rounded-lg p-3 text-center">
+                          <MapPin className="h-6 w-6 text-slate-400 mx-auto mb-1" />
+                          <p className="text-xs text-slate-600">ไม่มีสถานที่</p>
                         </div>
                       ) : (
-                        <div className="space-y-2">
+                        <div className="space-y-1.5 max-h-24 overflow-y-auto">
                           {product.stocklocation.map((sl) => (
-                            <div key={sl.id} className="flex items-center justify-between bg-gray-50 rounded-lg p-3">
-                              <div className="flex items-center space-x-3">
-                                <div className="flex items-center justify-center w-8 h-8 bg-blue-100 rounded-full">
-                                  <Store className="h-4 w-4 text-blue-600" />
+                            <div key={sl.id} className="flex items-center justify-between bg-slate-50 rounded-lg p-2">
+                              <div className="flex items-center space-x-2 min-w-0">
+                                <div className="flex items-center justify-center w-6 h-6 bg-blue-100 rounded-full flex-shrink-0">
+                                  <Store className="h-3 w-3 text-blue-600" />
                                 </div>
-                                <div>
-                                  <p className="font-medium text-gray-900">{sl.location.name}</p>
-                                  <p className="text-xs text-gray-600">คลังสินค้า</p>
-                                </div>
+                                <p className="text-xs font-medium text-slate-900 truncate">{sl.location.name}</p>
                               </div>
-                              <div className="text-right">
-                                <div className={`text-lg font-bold ${
-                                  sl.qty === 0 ? 'text-red-600' :
-                                  sl.qty < product.minimumStock ? 'text-yellow-600' : 'text-green-600'
-                                }`}>
-                                  {sl.qty}
-                                </div>
-                                <div className="text-xs text-gray-500">หน่วย</div>
+                              <div className={`text-sm font-bold ml-2 flex-shrink-0 ${
+                                sl.qty === 0 ? 'text-red-600' :
+                                sl.qty < product.minimumStock ? 'text-yellow-600' : 'text-green-600'
+                              }`}>
+                                {sl.qty}
                               </div>
                             </div>
                           ))}
@@ -284,23 +336,23 @@ export default function StorePage() {
                       )}
                     </div>
 
-                    {/* Quick Actions for Admin */}
-                    <div className="mt-6 pt-4 border-t border-gray-100">
-                      <div className="flex space-x-2">
+                    {/* Actions */}
+                    <div className="mt-4 pt-3 border-t border-slate-100">
+                      <div className="grid grid-cols-2 gap-2">
                         <Link
-                          href={`/inventory/stock`}
-                          className="flex-1 inline-flex items-center justify-center px-3 py-2 text-xs font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
+                          href="/inventory/stock"
+                          className="flex items-center justify-center px-3 py-2 text-xs font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
                         >
                           <Eye className="h-3 w-3 mr-1" />
-                          ดูรายละเอียด
+                          ดู
                         </Link>
-                        <button
-                          onClick={() => window.open(`/inventory`, '_blank')}
-                          className="flex-1 inline-flex items-center justify-center px-3 py-2 text-xs font-medium text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
+                        <Link
+                          href="/inventory"
+                          className="flex items-center justify-center px-3 py-2 text-xs font-medium text-slate-700 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors"
                         >
                           <Package className="h-3 w-3 mr-1" />
-                          จัดการสต็อก
-                        </button>
+                          จัดการ
+                        </Link>
                       </div>
                     </div>
                   </div>
@@ -309,61 +361,62 @@ export default function StorePage() {
             })}
           </div>
         ) : (
-          // List view
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+          // List view - Mobile optimized
+          <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full border-collapse">
-                <thead className="bg-gray-50 border-b border-gray-200">
+              <table className="w-full border-collapse min-w-[640px]">
+                <thead className="bg-slate-50 border-b border-slate-200">
                   <tr>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">สินค้า</th>
-                    <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700">ราคา</th>
-                    <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700">สต็อก</th>
-                    <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700">ที่ตั้ง</th>
-                    <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700">สถานะ</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-slate-700">สินค้า</th>
+                    <th className="px-4 py-3 text-center text-xs font-semibold text-slate-700">ราคา</th>
+                    <th className="px-4 py-3 text-center text-xs font-semibold text-slate-700">สต็อก</th>
+                    <th className="px-4 py-3 text-center text-xs font-semibold text-slate-700">สถานที่</th>
+                    <th className="px-4 py-3 text-center text-xs font-semibold text-slate-700">สถานะ</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200">
+                <tbody className="divide-y divide-slate-200">
                   {filteredProducts.map((product) => {
                     const totalStock = getTotalStock(product.stocklocation);
                     return (
-                      <tr key={product.id} className="hover:bg-gray-50 transition-colors">
-                        <td className="px-6 py-4">
+                      <tr key={product.id} className="hover:bg-slate-50 transition-colors">
+                        <td className="px-4 py-3">
                           <div>
-                            <p className="font-medium text-gray-900">{product.name}</p>
-                            <p className="text-sm text-gray-600">SKU: {product.sku}</p>
+                            <p className="font-medium text-slate-900 text-sm">{product.name}</p>
+                            <p className="text-xs text-slate-600">{product.sku}</p>
                           </div>
                         </td>
-                        <td className="px-6 py-4 text-center">
-                          <span className="font-semibold text-green-600">${product.sellingPrice}</span>
+                        <td className="px-4 py-3 text-center">
+                          <span className="font-semibold text-green-600 text-sm">${product.sellingPrice}</span>
                         </td>
-                        <td className="px-6 py-4 text-center">
-                          <span className={`font-medium ${
+                        <td className="px-4 py-3 text-center">
+                          <span className={`font-medium text-sm ${
                             totalStock === 0 ? 'text-red-600' :
                             totalStock < product.minimumStock ? 'text-yellow-600' : 'text-green-600'
                           }`}>
                             {totalStock}
                           </span>
-                          <div className="text-xs text-gray-500 mt-1">
+                          <div className="text-xs text-slate-500 mt-0.5">
                             Min: {product.minimumStock}
                           </div>
                         </td>
-                        <td className="px-6 py-4 text-center">
-                          <div className="text-sm text-gray-600">
+                        <td className="px-4 py-3">
+                          <div className="text-xs text-slate-600 space-y-0.5">
                             {product.stocklocation.map((sl, idx) => (
-                              <div key={idx}>
-                                {sl.location.name}: {sl.qty}
+                              <div key={idx} className="flex justify-between">
+                                <span>{sl.location.name}:</span>
+                                <span className="font-medium ml-2">{sl.qty}</span>
                               </div>
                             ))}
                           </div>
                         </td>
-                        <td className="px-6 py-4 text-center">
-                          <span className={`px-2 py-1 rounded text-xs font-semibold ${
+                        <td className="px-4 py-3 text-center">
+                          <span className={`px-2 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${
                             totalStock === 0 ? 'bg-red-100 text-red-700' :
                             totalStock < product.minimumStock ? 'bg-yellow-100 text-yellow-700' :
                             'bg-green-100 text-green-700'
                           }`}>
-                            {totalStock === 0 ? 'สินค้าหมด' :
-                             totalStock < product.minimumStock ? 'สินค้าเหลือน้อย' : 'มีสินค้าพร้อมส่ง'}
+                            {totalStock === 0 ? 'หมด' :
+                             totalStock < product.minimumStock ? 'เหลือน้อย' : 'มีสินค้า'}
                           </span>
                         </td>
                       </tr>
@@ -376,23 +429,23 @@ export default function StorePage() {
         )}
 
         {!loading && filteredProducts.length === 0 && (
-          <div className="text-center py-12">
-            <Package className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              {searchTerm ? 'No products found' : 'No products available'}
+          <div className="text-center py-16 px-4">
+            <Package className="mx-auto h-16 w-16 text-slate-400 mb-4" />
+            <h3 className="text-lg font-medium text-slate-900 mb-2">
+              {searchTerm || filterStatus !== 'all' ? 'ไม่พบสินค้า' : 'ยังไม่มีสินค้า'}
             </h3>
-            <p className="text-gray-600">
-              {searchTerm ? 'Try adjusting your search terms.' : 'Products will appear here once added to inventory.'}
+            <p className="text-slate-600 text-sm max-w-md mx-auto">
+              {searchTerm || filterStatus !== 'all' ? 'ลองปรับเปลี่ยนตัวกรองหรือคำค้นหา' : 'สินค้าจะแสดงที่นี่เมื่อเพิ่มลงในระบบ'}
             </p>
           </div>
         )}
       </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 mt-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center text-gray-600">
-            <p>&copy; ระบบบริหารจัดการสินค้าคงคลัง 2024 สงวนลิขสิทธิ์ทุกประการ</p>
+      <footer className="bg-white border-t border-slate-200 mt-12 lg:mt-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
+          <div className="text-center text-slate-600 text-sm">
+            <p>&copy; {new Date().getFullYear()} ระบบบริหารจัดการสินค้าคงคลัง</p>
           </div>
         </div>
       </footer>
