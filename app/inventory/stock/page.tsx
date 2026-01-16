@@ -73,7 +73,7 @@ export default function StockPage() {
                 className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
               >
                 <ArrowLeft size={20} />
-                <span>Back to Dashboard</span>
+                <span>กลับไปยังแดชบอร์ด</span>
               </Link>
             </div>
             <div className="flex items-center space-x-4">
@@ -81,13 +81,13 @@ export default function StockPage() {
                 href="/"
                 className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
               >
-                View Store
+                ดูร้านค้า
               </Link>
             </div>
           </div>
           <div className="mt-4">
-            <h1 className="text-3xl font-bold text-gray-900">Stock Management</h1>
-            <p className="text-gray-600 mt-1">Manage product inventory and stock levels</p>
+            <h1 className="text-3xl font-bold text-gray-900">จัดการสต็อก</h1>
+            <p className="text-gray-600 mt-1">จัดการสินค้าคงคลังและระดับสต็อก</p>
           </div>
         </div>
 
@@ -101,20 +101,20 @@ export default function StockPage() {
               onClick={() => setShowAddProduct(true)}
               className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
             >
-              <Plus size={18} /> Add Product
+              <Plus size={18} /> เพิ่มสินค้า
             </button>
             <button
               onClick={() => setShowImport(true)}
               className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors"
             >
-              <Upload size={18} /> Import Excel
+              <Upload size={18} /> นำเข้า Excel
             </button>
             <button
               onClick={load}
               disabled={loading}
               className="inline-flex items-center gap-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 disabled:bg-gray-400 text-white rounded-lg font-medium transition-colors"
             >
-              <RotateCcw size={18} /> Refresh
+              <RotateCcw size={18} /> รีเฟรชข้อมูล
             </button>
           </div>
         </div>
@@ -122,7 +122,7 @@ export default function StockPage() {
         {/* Stock Table */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
           <div className="border-b border-gray-200 bg-gray-50 px-6 py-4">
-            <h2 className="text-lg font-semibold text-gray-900">Product Inventory</h2>
+            <h2 className="text-lg font-semibold text-gray-900">สินค้าคงคลัง</h2>
           </div>
 
           <div className="overflow-x-auto">
@@ -130,19 +130,19 @@ export default function StockPage() {
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">SKU</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Product Name</th>
-                  <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700">Selling Price</th>
-                  <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700">Total Stock</th>
-                  <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700">Min Stock</th>
-                  <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700">Status</th>
-                  <th className="px-6 py-3 text-right text-sm font-semibold text-gray-700">Actions</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">ชื่อสินค้า</th>
+                  <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700">ราคาขาย</th>
+                  <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700">สต็อกทั้งหมด</th>
+                  <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700">สต็อกขั้นต่ำ</th>
+                  <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700">สถานะ</th>
+                  <th className="px-6 py-3 text-right text-sm font-semibold text-gray-700">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {loading ? (
-                  <tr><td colSpan={7} className="px-6 py-12 text-center text-gray-500">Loading products...</td></tr>
+                  <tr><td colSpan={7} className="px-6 py-12 text-center text-gray-500">กำลังโหลดสินค้า...</td></tr>
                 ) : filtered.length === 0 ? (
-                  <tr><td colSpan={7} className="px-6 py-12 text-center text-gray-500">No products found</td></tr>
+                  <tr><td colSpan={7} className="px-6 py-12 text-center text-gray-500">ไม่พบสินค้า</td></tr>
                 ) : (
                   paginatedProducts.map(p => {
                     const currentStock = getStockAtLocation(p.stocklocation);
@@ -175,7 +175,7 @@ export default function StockPage() {
                               ? 'bg-yellow-100 text-yellow-700'
                               : 'bg-green-100 text-green-700'
                           }`}>
-                            {currentStock === 0 ? 'Out of Stock' : isLowStock ? 'Low Stock' : 'In Stock'}
+                            {currentStock === 0 ? 'สินค้าหมด' : isLowStock ? 'สินค้าเหลือน้อย' : 'มีสินค้าพร้อมส่ง'}
                           </span>
                         </td>
                         <td className="px-6 py-4 text-right space-x-2">
@@ -183,13 +183,13 @@ export default function StockPage() {
                             onClick={() => { setSelectedProduct(p); setShowAddStock(true); }}
                             className="px-3 py-1 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded text-xs font-medium transition-colors"
                           >
-                            Add Stock
+                            เพิ่มสต็อก
                           </button>
                           <button
                             onClick={() => { setSelectedProduct(p); setShowReduceStock(true); }}
                             className="px-3 py-1 bg-red-100 hover:bg-red-200 text-red-700 rounded text-xs font-medium transition-colors"
                           >
-                            Reduce Stock
+                            ลดสต็อก
                           </button>
                         </td>
                       </tr>

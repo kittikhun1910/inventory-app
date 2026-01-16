@@ -111,15 +111,15 @@ export default function InventoryDashboard() {
         <div className="mb-8">
           <div className="flex justify-between items-start">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">Inventory Dashboard</h1>
-              <p className="text-gray-600">Manage your store inventory efficiently</p>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">แดชบอร์ดสินค้าคงคลัง</h1>
+              <p className="text-gray-600">จัดการสินค้าคงคลังในร้านของคุณอย่างมีประสิทธิภาพ</p>
             </div>
             <div className="flex items-center space-x-4">
               <Link
                 href="/"
                 className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
               >
-                View Store
+                ดูร้านค้า
               </Link>
             </div>
           </div>
@@ -129,33 +129,33 @@ export default function InventoryDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <StatCard
             icon={Boxes}
-            title="Total Products"
+            title="สินค้าทั้งหมด"
             value={loading ? '...' : stats.totalProducts}
-            subtitle="Active inventory items"
+            subtitle="สินค้าคงคลังที่ใช้งานอยู่"
             color="hover:shadow-md transition-shadow"
             link="/inventory/stock"
           />
           <StatCard
             icon={MapPin}
-            title="Locations"
+            title="สถานที่ตั้งทั้งหมด"
             value={loading ? '...' : stats.totalLocations}
-            subtitle="Storage locations"
+            subtitle="ที่ตั้งคลังสินค้าที่กำหนดไว้"
             color="hover:shadow-md transition-shadow"
             link="/inventory/locations"
           />
           <StatCard
             icon={AlertTriangle}
-            title="Low Stock Items"
+            title="สินค้าคงคลังต่ำ"
             value={loading ? '...' : stats.lowStockItems}
-            subtitle="Need attention"
+            subtitle="รายการที่ต้องสั่งซื้อเพิ่ม"
             color={stats.lowStockItems > 0 ? 'bg-yellow-50 border-yellow-200 hover:shadow-md' : 'hover:shadow-md transition-shadow'}
             link="/inventory/reports"
           />
           <StatCard
             icon={BarChart3}
-            title="Inventory Value"
+            title="มูลค่าสินค้าคงคลัง"
             value={loading ? '...' : `$${(stats.totalInventoryValue / 1000).toFixed(1)}K`}
-            subtitle="Total stock value"
+            subtitle="มูลค่ารวมของสินค้าคงคลัง"
             color="hover:shadow-md transition-shadow"
             link="/inventory/reports"
           />
@@ -165,22 +165,22 @@ export default function InventoryDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           <QuickActionCard
             icon={Package}
-            title="Manage Stock"
-            description="Add, edit, and track product inventory"
+            title="จัดการสต็อก"
+            description="เพิ่ม, แก้ไข และติดตามสินค้าคงคลัง"
             link="/inventory/stock"
             color="hover:shadow-md"
           />
           <QuickActionCard
             icon={MapPin}
-            title="Location Management"
-            description="Configure storage locations and zones"
+            title="ที่ตั้งคลังสินค้า"
+            description="กำหนดค่าสถานที่จัดเก็บและโซน"
             link="/inventory/locations"
             color="hover:shadow-md"
           />
           <QuickActionCard
             icon={TrendingUp}
-            title="Reports & Analytics"
-            description="View insights and reorder recommendations"
+            title="รายงานและการวิเคราะห์"
+            description="ดูสถิติและประสิทธิภาพสินค้าคงคลัง"
             link="/inventory/reports"
             color="hover:shadow-md"
           />
@@ -191,7 +191,7 @@ export default function InventoryDashboard() {
           {/* Recent Products */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
             <div className="border-b border-gray-200 bg-gray-50 px-6 py-4">
-              <h2 className="text-lg font-semibold text-gray-900">Recent Products</h2>
+              <h2 className="text-lg font-semibold text-gray-900">ผลิตภัณฑ์ล่าสุด</h2>
             </div>
             <div className="divide-y divide-gray-200">
               {loading ? (
@@ -201,12 +201,12 @@ export default function InventoryDashboard() {
               ) : recentProducts.length === 0 ? (
                 <div className="text-center py-8 px-6">
                   <Package className="mx-auto h-8 w-8 text-gray-400 mb-2" />
-                  <p className="text-gray-600">No products yet</p>
+                  <p className="text-gray-600">ยังไม่มีสินค้า</p>
                   <Link
                     href="/inventory/stock"
                     className="text-blue-600 hover:text-blue-700 text-sm font-medium mt-2 inline-block"
                   >
-                    Add your first product →
+                    เพิ่มสินค้าแรกของคุณ →
                   </Link>
                 </div>
               ) : (
@@ -235,7 +235,7 @@ export default function InventoryDashboard() {
                 href="/inventory/stock"
                 className="text-blue-600 hover:text-blue-700 text-sm font-medium"
               >
-                View all products →
+                ดูสินค้าทั้งหมด →
               </Link>
             </div>
           </div>
@@ -243,19 +243,19 @@ export default function InventoryDashboard() {
           {/* Quick Stats */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
             <div className="border-b border-gray-200 bg-gray-50 px-6 py-4">
-              <h2 className="text-lg font-semibold text-gray-900">Quick Stats</h2>
+              <h2 className="text-lg font-semibold text-gray-900">สถิติด่วน</h2>
             </div>
             <div className="p-6 space-y-4">
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">Average stock per product</span>
+                <span className="text-sm text-gray-600">สต็อกเฉลี่ยต่อสินค้า</span>
                 <span className="font-medium text-gray-900">
                   {stats.totalProducts > 0
                     ? Math.round(stats.totalInventoryValue / stats.totalProducts / 10) * 10
-                    : 0} units
+                    : 0} หน่วย
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">Stock efficiency</span>
+                <span className="text-sm text-gray-600">ประสิทธิภาพสต็อก</span>
                 <span className="font-medium text-green-600">
                   {stats.totalProducts > 0
                     ? Math.round((1 - stats.lowStockItems / stats.totalProducts) * 100)
@@ -263,11 +263,11 @@ export default function InventoryDashboard() {
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">Locations utilization</span>
+                <span className="text-sm text-gray-600">การใช้งานสถานที่</span>
                 <span className="font-medium text-blue-600">
                   {stats.totalLocations > 0
                     ? Math.round((stats.totalProducts / stats.totalLocations) * 10) / 10
-                    : 0} products/location
+                    : 0} สินค้า/สถานที่
                 </span>
               </div>
               <div className="border-t border-gray-200 pt-4 mt-4">
@@ -275,7 +275,7 @@ export default function InventoryDashboard() {
                   href="/inventory/reports"
                   className="text-blue-600 hover:text-blue-700 text-sm font-medium"
                 >
-                  View detailed analytics →
+                  ดูสถิติรายละเอียด →
                 </Link>
               </div>
             </div>

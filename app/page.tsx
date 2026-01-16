@@ -79,8 +79,8 @@ export default function StorePage() {
             <div className="flex items-center space-x-4">
               <ShoppingCart className="h-8 w-8 text-blue-600" />
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Store Inventory</h1>
-                <p className="text-sm text-gray-600">Find products and their locations</p>
+                <h1 className="text-2xl font-bold text-gray-900">สต๊อกสินค้า</h1>
+                <p className="text-sm text-gray-600">ค้นหาสินค้าและสถานที่จัดเก็บ</p>
               </div>
             </div>
             <div className="flex items-center space-x-4">
@@ -88,7 +88,7 @@ export default function StorePage() {
                 href="/inventory"
                 className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors"
               >
-                Admin Panel
+                แผงควบคุมผู้ดูแลระบบ
               </a>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -115,10 +115,10 @@ export default function StorePage() {
             </div>
             <div className="flex space-x-2">
               {[
-                { key: 'all', label: 'All', icon: null },
-                { key: 'in-stock', label: 'In Stock', icon: CheckCircle },
-                { key: 'low-stock', label: 'Low Stock', icon: AlertTriangle },
-                { key: 'out-of-stock', label: 'Out of Stock', icon: Package }
+                { key: 'all', label: 'ทั้งหมด', icon: null },
+                { key: 'in-stock', label: 'มีสินค้าพร้อมส่ง', icon: CheckCircle },
+                { key: 'low-stock', label: 'สินค้าเหลือน้อย', icon: AlertTriangle },
+                { key: 'out-of-stock', label: 'สินค้าหมด', icon: Package }
               ].map(({ key, label, icon: Icon }) => (
                 <button
                   key={key}
@@ -136,7 +136,7 @@ export default function StorePage() {
             </div>
           </div>
           <div className="flex items-center space-x-2">
-            <span className="text-sm text-gray-600">View:</span>
+            <span className="text-sm text-gray-600">เเสดง:</span>
             <div className="flex border border-gray-300 rounded-lg">
               <button
                 onClick={() => setViewMode('grid')}
@@ -154,7 +154,7 @@ export default function StorePage() {
           </div>
         </div>
         <div className="mt-3 text-sm text-gray-600">
-          Showing {filteredProducts.length} of {products.length} products
+          แสดง {filteredProducts.length} จาก {products.length} สินค้า
         </div>
       </div>
 
@@ -201,7 +201,7 @@ export default function StorePage() {
                         <div className="text-2xl font-bold text-green-600 mb-1">
                           ${product.sellingPrice}
                         </div>
-                        <div className="text-xs text-gray-500">per unit</div>
+                        <div className="text-xs text-gray-500">ต่อหน่วย</div>
                       </div>
                     </div>
 
@@ -210,15 +210,15 @@ export default function StorePage() {
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center space-x-2">
                           <Package className="h-5 w-5 text-gray-600" />
-                          <span className="font-medium text-gray-900">Stock Overview</span>
+                          <span className="font-medium text-gray-900">ภาพรวมสินค้าคงคลัง</span>
                         </div>
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                           totalStock === 0 ? 'bg-red-100 text-red-800' :
                           totalStock < product.minimumStock ? 'bg-yellow-100 text-yellow-800' :
                           'bg-green-100 text-green-800'
                         }`}>
-                          {totalStock === 0 ? 'Out of Stock' :
-                           totalStock < product.minimumStock ? 'Low Stock' : 'In Stock'}
+                          {totalStock === 0 ? 'สินค้าหมดสต็อก' :
+                           totalStock < product.minimumStock ? 'สินค้าคงคลังต่ำ' : 'มีสินค้า'}
                         </span>
                       </div>
 
@@ -230,13 +230,13 @@ export default function StorePage() {
                           }`}>
                             {totalStock}
                           </div>
-                          <div className="text-xs text-gray-600">Total Units</div>
+                          <div className="text-xs text-gray-600">รวมหน่วย</div>
                         </div>
                         <div className="bg-white rounded-lg p-3 border">
                           <div className="text-2xl font-bold text-blue-600">
                             {product.minimumStock}
                           </div>
-                          <div className="text-xs text-gray-600">Min Required</div>
+                          <div className="text-xs text-gray-600">ขั้นต่ำที่ต้องการ</div>
                         </div>
                       </div>
                     </div>
@@ -245,16 +245,16 @@ export default function StorePage() {
                     <div className="space-y-3">
                       <div className="flex items-center space-x-2">
                         <Warehouse className="h-5 w-5 text-gray-600" />
-                        <span className="font-medium text-gray-900">Warehouse Locations</span>
+                        <span className="font-medium text-gray-900">ที่ตั้งคลังสินค้า</span>
                         <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
-                          {product.stocklocation.length} location{product.stocklocation.length !== 1 ? 's' : ''}
+                          {product.stocklocation.length} ที่ตั้ง{product.stocklocation.length !== 1 ? 's' : ''}
                         </span>
                       </div>
 
                       {product.stocklocation.length === 0 ? (
                         <div className="bg-gray-50 rounded-lg p-4 text-center">
                           <MapPin className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                          <p className="text-sm text-gray-600">No warehouse locations assigned</p>
+                          <p className="text-sm text-gray-600">ไม่มีที่ตั้งคลังสินค้าที่กำหนดไว้</p>
                         </div>
                       ) : (
                         <div className="space-y-2">
@@ -266,7 +266,7 @@ export default function StorePage() {
                                 </div>
                                 <div>
                                   <p className="font-medium text-gray-900">{sl.location.name}</p>
-                                  <p className="text-xs text-gray-600">Warehouse</p>
+                                  <p className="text-xs text-gray-600">คลังสินค้า</p>
                                 </div>
                               </div>
                               <div className="text-right">
@@ -276,7 +276,7 @@ export default function StorePage() {
                                 }`}>
                                   {sl.qty}
                                 </div>
-                                <div className="text-xs text-gray-500">units</div>
+                                <div className="text-xs text-gray-500">หน่วย</div>
                               </div>
                             </div>
                           ))}
@@ -292,14 +292,14 @@ export default function StorePage() {
                           className="flex-1 inline-flex items-center justify-center px-3 py-2 text-xs font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
                         >
                           <Eye className="h-3 w-3 mr-1" />
-                          View Details
+                          ดูรายละเอียด
                         </Link>
                         <button
                           onClick={() => window.open(`/inventory`, '_blank')}
                           className="flex-1 inline-flex items-center justify-center px-3 py-2 text-xs font-medium text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
                         >
                           <Package className="h-3 w-3 mr-1" />
-                          Manage Stock
+                          จัดการสต็อก
                         </button>
                       </div>
                     </div>
@@ -315,11 +315,11 @@ export default function StorePage() {
               <table className="w-full border-collapse">
                 <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Product</th>
-                    <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700">Price</th>
-                    <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700">Stock</th>
-                    <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700">Locations</th>
-                    <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700">Status</th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">สินค้า</th>
+                    <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700">ราคา</th>
+                    <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700">สต็อก</th>
+                    <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700">ที่ตั้ง</th>
+                    <th className="px-6 py-3 text-center text-sm font-semibold text-gray-700">สถานะ</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
@@ -362,8 +362,8 @@ export default function StorePage() {
                             totalStock < product.minimumStock ? 'bg-yellow-100 text-yellow-700' :
                             'bg-green-100 text-green-700'
                           }`}>
-                            {totalStock === 0 ? 'Out of Stock' :
-                             totalStock < product.minimumStock ? 'Low Stock' : 'In Stock'}
+                            {totalStock === 0 ? 'สินค้าหมด' :
+                             totalStock < product.minimumStock ? 'สินค้าเหลือน้อย' : 'มีสินค้าพร้อมส่ง'}
                           </span>
                         </td>
                       </tr>
@@ -392,7 +392,7 @@ export default function StorePage() {
       <footer className="bg-white border-t border-gray-200 mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center text-gray-600">
-            <p>&copy; 2024 Inventory Management System. All rights reserved.</p>
+            <p>&copy; ระบบบริหารจัดการสินค้าคงคลัง 2024 สงวนลิขสิทธิ์ทุกประการ</p>
           </div>
         </div>
       </footer>

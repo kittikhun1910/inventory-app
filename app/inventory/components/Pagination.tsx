@@ -59,7 +59,7 @@ export default function Pagination({
     <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 bg-white border-t border-gray-200">
       {/* Items per page selector */}
       <div className="flex items-center gap-2 text-sm text-gray-700">
-        <span>Show</span>
+        <span>แสดง</span>
         <select
           value={itemsPerPage}
           onChange={(e) => onItemsPerPageChange(Number(e.target.value))}
@@ -69,14 +69,14 @@ export default function Pagination({
             <option key={size} value={size}>{size}</option>
           ))}
         </select>
-        <span>items per page</span>
+        <span>รายการต่อหน้า</span>
       </div>
 
       {/* Pagination info and controls */}
       <div className="flex items-center gap-4">
         {/* Items info */}
         <div className="text-sm text-gray-700">
-          Showing {startItem}-{endItem} of {totalItems} items
+          แสดง {startItem}-{endItem} จาก {totalItems} รายการ
         </div>
 
         {/* Page controls */}

@@ -101,8 +101,8 @@ export default function LocationsPage() {
             </div>
           </div>
           <div className="mt-4">
-            <h1 className="text-3xl font-bold text-gray-900">Location Management</h1>
-            <p className="text-gray-600 mt-1">Manage warehouse and store locations</p>
+            <h1 className="text-3xl font-bold text-gray-900">จัดการสถานที่เก็บสินค้า</h1>
+            <p className="text-gray-600 mt-1">จัดการสถานที่เก็บสินค้าและร้านค้า</p>
           </div>
         </div>
 
@@ -114,13 +114,13 @@ export default function LocationsPage() {
               className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
             >
               <Plus size={18} />
-              Add New Location
+              เพิ่มสถานที่ใหม่
             </button>
           ) : (
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Location Name
+                  ชื่อสถานที่
                 </label>
                 <input
                   type="text"
@@ -138,14 +138,14 @@ export default function LocationsPage() {
                   disabled={loading || !name.trim()}
                   className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-lg font-medium transition-colors"
                 >
-                  Create Location
+                  เพิ่มสถานที่
                 </button>
                 <button
                   onClick={() => { setShowAddForm(false); setName(''); }}
                   disabled={loading}
                   className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors"
                 >
-                  Cancel
+                  ยกเลิก
                 </button>
               </div>
             </div>
@@ -157,7 +157,7 @@ export default function LocationsPage() {
           <div className="border-b border-gray-200 bg-gray-50 px-6 py-4">
             <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
               <MapPin className="h-5 w-5 text-gray-600" />
-              All Locations ({locations.length})
+              สถานที่ทั้งหมด ({locations.length})
             </h2>
           </div>
 
@@ -168,14 +168,14 @@ export default function LocationsPage() {
           ) : locations.length === 0 ? (
             <div className="text-center py-12 px-6">
               <MapPin className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No locations yet</h3>
-              <p className="text-gray-600 mb-4">Create your first location to start organizing your inventory.</p>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">ยังไม่มีสถานที่</h3>
+              <p className="text-gray-600 mb-4">สร้างสถานที่แรกของคุณเพื่อเริ่มจัดการสต็อกของคุณ</p>
               <button
                 onClick={() => setShowAddForm(true)}
                 className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
               >
                 <Plus size={18} />
-                Add First Location
+                เพิ่มสถานที่ใหม่
               </button>
             </div>
           ) : (
@@ -199,7 +199,7 @@ export default function LocationsPage() {
                             className="flex items-center gap-1 px-3 py-2 bg-green-100 text-green-700 rounded hover:bg-green-200 disabled:opacity-50 font-medium text-sm"
                           >
                             <Check size={16} />
-                            Save
+                            บันทึก
                           </button>
                           <button
                             onClick={() => setEditing(null)}
@@ -207,7 +207,7 @@ export default function LocationsPage() {
                             className="flex items-center gap-1 px-3 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 disabled:opacity-50 font-medium text-sm"
                           >
                             <X size={16} />
-                            Cancel
+                            ยกเลิก
                           </button>
                         </div>
                       ) : (
@@ -226,7 +226,7 @@ export default function LocationsPage() {
                           title="Edit location"
                         >
                           <Edit size={14} />
-                          Edit
+                          แก้ไข
                         </button>
                         <button
                           onClick={() => doDelete(loc)}
@@ -235,7 +235,7 @@ export default function LocationsPage() {
                           title="Delete location"
                         >
                           <Trash2 size={14} />
-                          Delete
+                          ลบ
                         </button>
                       </div>
                     )}
@@ -251,7 +251,7 @@ export default function LocationsPage() {
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Total Locations</p>
+                <p className="text-sm text-gray-600">สถานที่ทั้งหมด</p>
                 <p className="text-2xl font-bold text-gray-900">{locations.length}</p>
               </div>
               <MapPin className="h-8 w-8 text-blue-600" />
@@ -260,7 +260,7 @@ export default function LocationsPage() {
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Active Locations</p>
+                <p className="text-sm text-gray-600">สถานที่ใช้งาน</p>
                 <p className="text-2xl font-bold text-green-600">{locations.length}</p>
               </div>
               <Check className="h-8 w-8 text-green-600" />
@@ -269,8 +269,8 @@ export default function LocationsPage() {
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Last Updated</p>
-                <p className="text-sm font-medium text-gray-900">Just now</p>
+                <p className="text-sm text-gray-600">อัปเดตล่าสุด</p>
+                <p className="text-sm font-medium text-gray-900">เมื่อสักครู่ก่อน</p>
               </div>
               <div className="h-8 w-8 bg-gray-100 rounded-full flex items-center justify-center">
                 <div className="h-3 w-3 bg-green-500 rounded-full"></div>
